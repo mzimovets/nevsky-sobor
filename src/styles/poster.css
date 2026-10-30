@@ -1,0 +1,80 @@
+/* Постер расписания — 1:1 перенесено из a_nevsky_react (App.css), чтобы
+   /schedule выглядела как экспорт с schedule.nevsky-sobor.ru. */
+
+@font-face {
+  font-family: Pompadur;
+  src: url("/poster/Izhitsa.ttf");
+}
+
+@font-face {
+  font-family: Font;
+  src: url("/poster/STIXGeneral-Regular.ttf");
+}
+
+.poster .font-serif {
+  font-family: "Pompadur", serif;
+}
+
+.poster-scale-wrap {
+  overflow: auto;
+}
+
+.f-img-block {
+  background: transparent;
+  overflow: hidden;
+  width: 911px;
+  height: 1288.414px;
+  position: relative;
+}
+
+.f-img-block img {
+  object-fit: contain;
+  height: 1288.414px;
+  width: 911px;
+}
+
+.schedule-table {
+  margin: 12px;
+  border-collapse: collapse;
+  border: none;
+  position: absolute;
+  left: 48px;
+  top: 128px;
+  font-family: Font, "STIXGeneral", "Times New Roman", serif;
+}
+
+.schedule-table td {
+  padding: 4px;
+  border: 1px #989898 solid;
+  align-content: center;
+  width: 385px;
+  vertical-align: top;
+}
+
+.schedule-table tr td:first-child {
+  border-left: none;
+  border-top: none;
+}
+.schedule-table tr:nth-child(1) td:first-child,
+.schedule-table tr:nth-child(1) td:last-child {
+  border: none;
+}
+.schedule-table tr td:last-child {
+  border-right: none;
+  border-top: none;
+  text-align: center;
+}
+.schedule-table tr:last-child td {
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+}
+
+.cell-heading p {
+  font-family: "Pompadur", "Izhitsa", serif;
+  margin: 0;
+}
+
+.schedule-table .tiptap.ProseMirror p {
+  margin: 0;
+}

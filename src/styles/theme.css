@@ -1,0 +1,570 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Slovic — демо-версия шрифта, взятая с сайта-референса (petrkhimki.ru) с
+   разрешения владельца собора; заменить на лицензионную копию при необходимости. */
+@font-face {
+  font-family: "Slovic";
+  src:
+    url("/fonts/slovic/Slovic_Demo_Var-SansSerif.woff2") format("woff2"),
+    url("/fonts/slovic/Slovic_Demo_Var-SansSerif.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Палитра — белый фон и красно-бордовые акценты (по макету) ── */
+@theme {
+  --color-maroon: #9b2316; /* хедер, акценты */
+  --color-maroon-dark: #8a1f14; /* hover/тёмный вариант */
+  --color-ink: #2b2326; /* основной текст на светлом фоне */
+  --color-paper: #fbf9f7; /* светлый фон разделов */
+  --color-slate: #2a1a17; /* тёмный фон-подложка под хиро */
+  --color-line: #e9e2dc;
+  --color-muted: #6f6360;
+
+  --color-tan: #cba27d;
+  --color-taupe: #b1957e;
+  --color-terracotta: #a7715b;
+  --color-cocoa: #684128;
+  --color-sage: #acb4b4;
+  --color-cream: #f5f1ed; /* светлее и холоднее paper — фон раздела «Новости», чтобы отличался от соседних секций */
+
+  --font-display: "Slovic", sans-serif;
+  --font-body: "Arsenal", sans-serif;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Текст расписания приходит HTML-строками из редактора (Tiptap) и может
+   нести инлайновый font-family/font-size («Устав», крупный шрифт и т.п.) —
+   переопределяем шрифтом и размером проекта (размер задаётся снаружи через
+   Tailwind-класс на контейнере, тут только гасим инлайн ниже по дереву),
+   а цвет и жирность (color/strong/b) из разметки сохраняем как есть. */
+.rich-heading,
+.rich-heading * {
+  font-family: var(--font-display) !important;
+}
+.rich-heading * {
+  font-size: 1em !important;
+}
+.rich-text,
+.rich-text * {
+  font-family: var(--font-body) !important;
+}
+.rich-text * {
+  font-size: 1em !important;
+}
+
+/* Переключение между историями-объявлениями (см. AnnouncementStoryModal.jsx)
+   — карточка каждый раз перемонтируется заново (key={item._id}), поэтому
+   нужна только фаза входа, без ухода: следующая/предыдущая история будто «подъезжает» с той стороны, откуда её
+   позвали (клик по пику или стрелке-зоне). */
+@keyframes story-in-right {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateX(36px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+@keyframes story-in-left {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateX(-36px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+.story-in-right {
+  animation: story-in-right 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.story-in-left {
+  animation: story-in-left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Содержимое статьи новости (RichTextEditor.jsx/NewsArticlePage.jsx) — общий
+   класс что для самого редактора (Tiptap выводит те же теги в contentEditable),
+   что и для сохранённого HTML на странице статьи, чтобы вид не «скакал»
+   между редактированием и просмотром. Картинка с подписью — кастомный узел
+   Tiptap (см. captionedImage в RichTextEditor.jsx), рендерится как
+   figure[data-align]/figcaption; data-align управляет обтеканием текстом. */
+.article-content {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--color-ink);
+}
+.article-content > *:first-child {
+  margin-top: 0;
+}
+.article-content p {
+  margin: 0 0 1em;
+}
+.article-content h2,
+.article-content h3 {
+  font-family: var(--font-display);
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-maroon);
+  margin: 1.4em 0 0.6em;
+}
+.article-content h2 {
+  font-size: 1.5em;
+}
+.article-content h3 {
+  font-size: 1.2em;
+}
+.article-content strong {
+  font-weight: 700;
+}
+.article-content em {
+  font-style: italic;
+}
+.article-content u {
+  text-decoration: underline;
+}
+.article-content a {
+  color: var(--color-terracotta);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.article-content ul,
+.article-content ol {
+  margin: 0 0 1em;
+  padding-left: 1.4em;
+}
+.article-content ul {
+  list-style: disc;
+}
+.article-content ol {
+  list-style: decimal;
+}
+.article-content blockquote {
+  margin: 1.2em 0;
+  padding: 0.2em 0 0.2em 1.1em;
+  border-left: 3px solid var(--color-terracotta);
+  color: var(--color-muted);
+  font-style: italic;
+}
+.article-content hr {
+  margin: 1.6em 0;
+  border: none;
+  border-top: 1px solid var(--color-line);
+}
+.article-content figure.article-figure {
+  margin: 0 0 1em;
+}
+.article-content figure.article-figure img {
+  display: block;
+  width: 100%;
+  border-radius: 0.75rem;
+}
+.article-content figure.article-figure figcaption {
+  margin-top: 0.4em;
+  text-align: center;
+  font-size: 0.8em;
+  color: var(--color-muted);
+}
+/* Обтекание текстом — картинка «уплывает» в свою сторону, абзацы вокруг
+   обтекают её (обычный float, а не grid/flex). clear-after (см. ниже) не даёт следующему
+   крупному блоку (h2/h3/следующей full-картинке) наезжать на хвост
+   обтекания. */
+/* Ширина картинки — управляется атрибутом узла width (инлайн-стиль на
+   figure, см. renderHTML в RichTextEditor.jsx), а не тут: тут только
+   обтекание (float) и отступы, чтобы соседний текст не прилипал вплотную. */
+.article-content figure.article-figure[data-align="left"] {
+  float: left;
+  margin: 0 1.2em 0.8em 0;
+}
+.article-content figure.article-figure[data-align="right"] {
+  float: right;
+  margin: 0 0 0.8em 1.2em;
+}
+.article-content figure.article-figure[data-align="center"] {
+  margin-inline: auto;
+  margin-bottom: 1.2em;
+}
+.article-content h2,
+.article-content h3,
+.article-content figure.article-figure[data-align="full"],
+.article-content figure.article-figure[data-align="center"] {
+  clear: both;
+}
+
+/* Подсказка «/» в пустом блоке под курсором (@tiptap/extension-placeholder,
+   showOnlyCurrent по умолчанию — значит показывается только там, где сейчас
+   каретка, а не на каждой пустой строке разом, как в Notion). */
+.tiptap p.is-empty::before,
+.tiptap h2.is-empty::before,
+.tiptap h3.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--color-muted);
+  opacity: 0.6;
+}
+
+/* Хиро главной (концепт): шапка прозрачная поверх картинки, заголовок —
+   антиква Cormorant, как на макете. */
+.font-slovic {
+  font-family: "Slovic", sans-serif;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+.font-serif-hero {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Рамка с вогнутыми («вырезанными») скруглёнными углами — через маску, чтобы
+   backdrop-blur тоже обрезался по форме. */
+.notched {
+  --notch: 22px;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000) top left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000) top right / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000) bottom right / 51% 51% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at 0 0, #0000 98%, #000) top left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 0, #0000 98%, #000) top right / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 0 100%, #0000 98%, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 100%, #0000 98%, #000) bottom right / 51% 51% no-repeat;
+}
+
+/* Золотая градиентная кайма для .notched: рисуется псевдоэлементом с маской из
+   8 частей (4 прямых отрезка + 4 дуги вдоль вырезанных углов), поэтому
+   повторяет форму рамки; на hover градиент сдвигается и «играет». */
+@property --glow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --mx {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: -999px;
+}
+@property --my {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: -999px;
+}
+.gold-frame {
+  --ring: 1.5px;
+  transition:
+    --glow 0.7s ease,
+    --mx 0.2s ease-out,
+    --my 0.2s ease-out;
+}
+.gold-frame:hover {
+  --glow: 1;
+}
+.gold-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 240px at var(--mx) var(--my), color-mix(in srgb, #ffffff calc(var(--glow) * 100%), transparent) 0%, color-mix(in srgb, #d4d4d8 calc(var(--glow) * 100%), transparent) 30%, color-mix(in srgb, #9a9aa2 calc(var(--glow) * 100%), transparent) 55%, transparent 100%),
+    linear-gradient(135deg, rgba(190, 190, 196, 0.5), rgba(150, 150, 158, 0.45) 50%, rgba(200, 200, 206, 0.5));
+  background-size: 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0;
+  --corner: calc(var(--notch) + var(--ring) + 1px);
+  --arc: #0000 calc(var(--notch) - 0.5px), #000 var(--notch), #000 calc(var(--notch) + var(--ring)),
+    #0000 calc(var(--notch) + var(--ring) + 0.5px);
+  -webkit-mask:
+    linear-gradient(#000 0 0) 50% 0 / calc(100% - 2 * var(--notch)) var(--ring) no-repeat,
+    linear-gradient(#000 0 0) 50% 100% / calc(100% - 2 * var(--notch)) var(--ring) no-repeat,
+    linear-gradient(#000 0 0) 0 50% / var(--ring) calc(100% - 2 * var(--notch)) no-repeat,
+    linear-gradient(#000 0 0) 100% 50% / var(--ring) calc(100% - 2 * var(--notch)) no-repeat,
+    radial-gradient(circle at 0 0, var(--arc)) 0 0 / var(--corner) var(--corner) no-repeat,
+    radial-gradient(circle at 100% 0, var(--arc)) 100% 0 / var(--corner) var(--corner) no-repeat,
+    radial-gradient(circle at 0 100%, var(--arc)) 0 100% / var(--corner) var(--corner) no-repeat,
+    radial-gradient(circle at 100% 100%, var(--arc)) 100% 100% / var(--corner) var(--corner) no-repeat;
+  mask:
+    linear-gradient(#000 0 0) 50% 0 / calc(100% - 2 * var(--notch)) var(--ring) no-repeat,
+    linear-gradient(#000 0 0) 50% 100% / calc(100% - 2 * var(--notch)) var(--ring) no-repeat,
+    linear-gradient(#000 0 0) 0 50% / var(--ring) calc(100% - 2 * var(--notch)) no-repeat,
+    linear-gradient(#000 0 0) 100% 50% / var(--ring) calc(100% - 2 * var(--notch)) no-repeat,
+    radial-gradient(circle at 0 0, var(--arc)) 0 0 / var(--corner) var(--corner) no-repeat,
+    radial-gradient(circle at 100% 0, var(--arc)) 100% 0 / var(--corner) var(--corner) no-repeat,
+    radial-gradient(circle at 0 100%, var(--arc)) 0 100% / var(--corner) var(--corner) no-repeat,
+    radial-gradient(circle at 100% 100%, var(--arc)) 100% 100% / var(--corner) var(--corner) no-repeat;
+}
+
+/* мягкое золотое свечение внутри рамки следом за курсором */
+.gold-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle 320px at var(--mx) var(--my), color-mix(in srgb, #b4b4bc calc(var(--glow) * 16%), transparent), transparent 70%);
+}
+
+/* Красная кнопка (без перелива): ровная заливка, при наведении чуть темнее. */
+.shimmer-gold {
+  background: linear-gradient(180deg, #b3382a, #8a1f14);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+.shimmer-gold:hover { filter: brightness(0.92); }
+
+/* Наклон карточки дня к курсору с подъёмом при наведении (DaySchedule.jsx).
+   Двигаются только transform и opacity — идут на видеокарте, без
+   перерисовки теней. --rx/--ry выставляет onCardMove по позиции курсора. */
+.dwrap { perspective: 1000px; }
+.dcard {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.5s ease, opacity 0.3s ease;
+}
+/* Рамка и лёгкая тень у карточек в покое; при наведении рамка становится
+   золотой, а .dlayer добавляет глубокую тень. */
+.dcard:not(.is-today) {
+  border-color: rgba(184, 69, 58, 0.38);
+  box-shadow: 0 10px 22px -16px rgba(70, 20, 14, 0.4);
+}
+.dcard.is-today { box-shadow: 0 16px 28px -16px rgba(22, 20, 15, 0.55); }
+.dcard.is-past { opacity: 0.55; }
+.dwrap:hover .dcard.is-past { opacity: 1; }
+.dlayer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 30px 40px -26px rgba(70, 20, 14, 0.5);
+  transition: opacity 0.6s ease;
+}
+.dcard.is-today .dlayer { box-shadow: 0 30px 44px -26px rgba(22, 20, 15, 0.6); }
+.dwrap:hover .dcard {
+  transform: rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg)) translateY(-6px);
+}
+.dwrap:hover .dcard:not(.is-today) { border-color: rgba(184, 69, 58, 0.5); }
+/* Широкая карточка «Сегодня» поднимается совсем немного. */
+.dwrap:hover .dcard-wide {
+  transform: rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg)) translateY(-2px);
+}
+.dwrap:hover .dlayer { opacity: 1; }
+/* Тонкая золотая обводка при наведении: яркое пятно градиента скользит по
+   рамке вслед за курсором (--mx/--my выставляет onCardMove), по остальной
+   рамке идёт приглушённое золото. Кольцо рисуется маской (1px), поэтому
+   внутри карточки ничего не перекрывает; появляется и исчезает плавно —
+   через opacity, пятно остаётся там, где курсор вышел, и гаснет на месте. */
+.dcard::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(
+    240px circle at var(--mx, -999px) var(--my, -999px),
+    #ffd9d3 0%,
+    #e8806f 22%,
+    #d4574a 48%,
+    rgba(184, 69, 58, 0.45) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.dwrap:hover .dcard::before { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .dcard, .dlayer { transition: none !important; } }
+
+/* Появление при прокрутке (Reveal.jsx), как на sobormihailsochi.ru. */
+.tx-w { display: inline-block; clip-path: inset(-0.4em -0.25em -0.24em -0.25em); }
+[data-split="rise"] .tx-i {
+  display: inline-block;
+  padding: 0.22em 0.06em 0.16em;
+  margin: -0.22em -0.06em -0.16em;
+  transform: translateY(150%) rotate(5deg);
+  transform-origin: 0 100%;
+  transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-split="rise"].tx-in .tx-i { transform: none; }
+[data-split="wave"] .tx-w { clip-path: none; }
+[data-split="wave"] .tx-i {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.7em);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-split="wave"].tx-in .tx-i { opacity: 1; transform: none; }
+
+.eb { opacity: 0; letter-spacing: 0.6em; transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), letter-spacing 1.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.eb.eb-in { opacity: 1; letter-spacing: 0.3em; }
+.eb .eb-dot { display: inline-block; transform: rotate(-135deg) scale(0.2); transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s; }
+.eb.eb-in .eb-dot { transform: none; }
+.eb .eb-line { transform: scaleX(0); transform-origin: 0 50%; transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.35s; }
+.eb.eb-in .eb-line { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .tx-i, .eb, .eb-dot, .eb-line { transition: none !important; }
+}
+
+/* Слова Спасителя в чтениях (DayPage.jsx) */
+.christ-scope em.christ { font-style: normal; color: #9a1b1b; }
+
+/* Карточки «Полезных ссылок» (Footer.jsx): в покое — только крупный значок по
+   центру, при наведении под ним плавно «вырастает» название с пояснением, а
+   значок уменьшается и остаётся по центру оставшегося места — текст никогда не
+   наезжает на картинку. На устройствах без наведения (телефон) текст виден
+   всегда. */
+.lc-stage { flex: 1; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr); place-items: center; width: 100%; }
+.lc-text { text-align: center; margin-top: 0.75rem; }
+@media (hover: hover) {
+  .lc { padding: 0.75rem; aspect-ratio: 1 / 1; }
+  .lc-logo { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); transform: scale(1.12); }
+  .lc-text {
+    margin-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, margin-top 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .lc:hover .lc-logo,
+  .lc:focus-visible .lc-logo { transform: scale(0.52); }
+  .lc:hover .lc-text,
+  .lc:focus-visible .lc-text { max-height: 8rem; margin-top: 0.25rem; opacity: 1; transition-delay: 0s, 0.1s, 0s; }
+}
+@media (hover: none) {
+  .lc { min-height: 14rem; }
+  .lc-logo { transform: none; }
+}
+
+/* Фон карточек «Полезных ссылок»: тёплый градиент с цветным пятном под цвет
+   значка (--lc-a/--lc-b задаются в Footer.jsx) и мягким кругом за значком. */
+.lc-bg {
+  background:
+    radial-gradient(120% 90% at 18% 0%, var(--lc-a) 0%, transparent 62%),
+    linear-gradient(165deg, #f8f0e3 0%, var(--lc-b) 100%);
+}
+.lc-logo::before {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.35) 55%, transparent 72%);
+  border: 1px solid rgba(184, 69, 58, 0.28);
+}
+.lc-logo img { position: relative; }
+
+/* Карточка Евангелия на странице дня (DayPage.jsx) — те же подъём, наклон и
+   золотая обводка, что у карточек расписания; обводка рисуется внутри
+   (overflow: hidden у карточки обрезал бы внешнюю), тень — обычной box-shadow. */
+.dcard-solo {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.5s ease, box-shadow 0.7s ease;
+}
+.dcard-solo::before { inset: 0; }
+.dwrap:hover .dcard-solo {
+  transform: translateY(-4px);
+  border-color: rgba(184, 69, 58, 0.6);
+  box-shadow: 0 28px 38px -26px rgba(70, 20, 14, 0.5);
+}
+.dwrap:hover .dcard-solo.is-open { transform: none; }
+.dwrap:hover .dcard-solo.is-open::before { opacity: 0; }
+
+/* Текст из редактора (расписание) тем же шрифтом, что и список святых ниже
+   (Cormorant): .rich-text принудительно ставит основной шрифт, этот класс — серифный. */
+.serif-force,
+.serif-force * {
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+}
+.serif-force * { font-size: 1em !important; }
+
+/* Оглавление акафиста: плавный выезд слева и каскадное появление пунктов */
+.toc-dialog {
+  --drawer-enter-duration: 700ms;
+  --drawer-exit-duration: 380ms;
+  --drawer-enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --drawer-exit-ease: cubic-bezier(0.5, 0, 0.75, 0);
+}
+.toc-dialog[data-placement="left"] {
+  border-radius: 0 34px 34px 0;
+  box-shadow: 0 0 60px rgba(40, 25, 10, 0.35);
+}
+
+
+/* Оглавление акафиста: «дышащая» точка и медленный блик на текущем разделе */
+@keyframes toc-breathe {
+  0%, 100% { scale: 1.1; box-shadow: 0 0 0 3px rgba(155, 35, 22, 0.28); }
+  50% { scale: 1.4; box-shadow: 0 0 0 9px rgba(155, 35, 22, 0); }
+}
+.toc-dot-active { animation: toc-breathe 2.8s ease-in-out infinite; }
+@keyframes toc-metal {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+/* полированное золото: блики разной яркости лежат полосами и медленно плывут */
+.toc-glint {
+  background-image: linear-gradient(
+    112deg,
+    #6a160d 0%, #a67c36 14%, #e8cb86 24%, #b48a40 33%, #6a160d 46%,
+    #a77d37 58%, #dcbb74 68%, #8f6a2c 80%, #6a160d 100%
+  );
+  background-size: 260% 100%;
+  animation: toc-metal 9s ease-in-out infinite alternate;
+  text-shadow: 0 1px 2px rgba(50, 30, 5, 0.65);
+}
+@media (prefers-reduced-motion: reduce) {
+  .toc-dot-active, .toc-glint { animation: none; }
+}
+
+/* Подсказка при первом открытии акафиста */
+@keyframes hint-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hint-rise { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes hint-swipe {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(18px); }
+}
+.hint-backdrop { animation: hint-fade 400ms ease-out both; }
+.hint-card { animation: hint-rise 650ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both; }
+.hint-finger { animation: hint-swipe 2.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .hint-backdrop, .hint-card, .hint-finger { animation: none; }
+}
+
+/* Реквизиты: при наведении под строками плавно вырастает линия, по клику — копирование */
+.copy-hl {
+  display: inline;
+  padding-bottom: 0.06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background-image: linear-gradient(#d4574a, #d4574a);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.copy-btn { display: block; text-align: left; cursor: pointer; }
+.copy-btn:hover .copy-hl, .copy-btn:focus-visible .copy-hl { background-size: 100% 2px; }
+.copy-btn:focus-visible { outline: none; }
+@media (prefers-reduced-motion: reduce) { .copy-hl { transition: none; } }
