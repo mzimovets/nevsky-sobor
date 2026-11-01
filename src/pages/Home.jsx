@@ -6,7 +6,7 @@ import AkathistBanner from "../components/AkathistBanner.jsx";
 import NewsSection from "../components/NewsSection.jsx";
 
 export default function Home() {
-  const { loading, days } = useLiveSchedule();
+  const { loading, days, fontSize } = useLiveSchedule();
 
   return (
     <>
@@ -24,7 +24,7 @@ export default function Home() {
           slice(0,6)) — DaySchedule сам находит сегодняшний день внутри него
           (todayIndex) и стартует с него, но теперь может листать стрелкой
           назад и в прошлые дни расписания, а не только вперёд. */}
-      <DaySchedule days={days} />
+      <DaySchedule days={days} fontSize={fontSize} />
 
       <AkathistBanner />
 

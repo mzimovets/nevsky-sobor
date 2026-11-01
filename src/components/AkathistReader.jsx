@@ -7,9 +7,11 @@ import { akathist, akathistSections } from "../data/akathist.js";
 // Шрифт и фоны собраны здесь — чтобы поменять вид книги, правьте эти классы:
 // TEXT_FONT (шрифт текста), PAGE_BG (бумага страниц).
 const TEXT_FONT = "font-serif-hero";
-const PAGE_BG = "bg-gradient-to-b from-[#f9f2e3] to-[#f0e4cb]";
+const PAGE_BG = "bg-white";
 const GOLD_TEXT = "bg-gradient-to-b from-[#c0392b] to-[#7a1a10] bg-clip-text text-transparent";
-const STORAGE_KEY = "akathist-alexander-nevsky:progress";
+// Место чтения держим только в памяти страницы: закрыли и снова открыли —
+// продолжаем, а после перезагрузки страницы акафист начинается сначала.
+let lastFrac = 0;
 const HINT_KEY = "akathist-alexander-nevsky:hint-seen";
 const FLIP_MS = 850;
 
@@ -288,15 +290,7 @@ function Book({ onProgress, onToc }) {
   const fracRef = useRef(null);
   useEffect(() => {
     if (!N) return;
-    if (fracRef.current == null) {
-      let f = 0;
-      try {
-        f = Number(localStorage.getItem(STORAGE_KEY)) || 0;
-      } catch {
-        /* без сохранения */
-      }
-      fracRef.current = Math.min(1, Math.max(0, f));
-    }
+    if (fracRef.current == null) fracRef.current = Math.min(1, Math.max(0, lastFrac));
     setPos(Math.round(fracRef.current * (N - 1)));
   }, [N]);
 
@@ -304,11 +298,7 @@ function Book({ onProgress, onToc }) {
     if (pos == null || !N) return;
     const frac = N > 1 ? pos / (N - 1) : 0;
     fracRef.current = frac;
-    try {
-      localStorage.setItem(STORAGE_KEY, String(frac));
-    } catch {
-      /* без сохранения */
-    }
+    lastFrac = frac;
     onProgress?.({ page: pos + 1, total: N, frac });
   }, [pos, N, onProgress]);
 
@@ -502,7 +492,7 @@ function TocList({ toc, current, activeSet, onGo }) {
               aria-hidden
               className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition-all ${
                 ikos ? "h-3.5 w-3.5" : "h-2 w-2"
-              } ${active ? "toc-dot-active border-[#7a1a10] bg-[#7a1a10]" : "border-[#d4574a] bg-[#f6eddb]"}`}
+              } ${active ? "toc-dot-active border-[#7a1a10] bg-[#7a1a10]" : "border-[#d4574a] bg-white"}`}
               style={{ left: -0.5, animationDelay: active ? `${-(i % 7) * 0.9}s` : undefined }}
             >
               {active && <span className="absolute inset-[18%] rounded-full bg-[#f8ecc9] shadow-[0_0_4px_rgba(255,240,200,0.9)]" />}
@@ -512,7 +502,6 @@ function TocList({ toc, current, activeSet, onGo }) {
               ref={i === current ? scrollRef : undefined}
               aria-current={active ? "true" : undefined}
               onClick={() => onGo(t.page)}
-              style={active ? { animationDelay: `${-(i % 5) * 2.7}s`, animationDuration: `${8 + (i % 3)}s` } : undefined}
               className={`ml-5 flex w-[calc(100%-1.25rem)] items-center justify-between gap-3 rounded-xl px-3 text-left transition-all ${
                 ikos ? "my-0.5 py-2.5 text-[19px]" : "py-1.5 text-[15px]"
               } ${
@@ -602,7 +591,7 @@ function FirstHint() {
             </Row>
           )}
           <Row
-            title={touch ? "Кнопки" : "Стрелки и клавиши"}
+            title={touch ? "Кнопки" : "Переход по страницам"}
             icon={
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M3 12h7M6 8l-3 4 3 4M21 12h-7M18 8l3 4-3 4" />
@@ -647,11 +636,13 @@ export default function AkathistReader({ children, className = "" }) {
   const atStart = info.page <= 1;
   const atEnd = info.page >= info.total;
   const [tocOpen, setTocOpen] = useState(false);
-  // раздел «на экране», если страница между его началом и концом (следующий
-  // раздел, начавшийся с верха страницы, эту страницу уже не затрагивает);
-  // если на странице идут два раздела подряд, светятся оба
+  // Подсвечивается раздел, чей ЗАГОЛОВОК сейчас на открытой странице (если
+  // заголовков два — оба). Если на странице заголовка нет (идёт продолжение
+  // текста), светится последний заголовок до неё — тот, что читаем.
   const cur = info.page - 1;
-  const activeSet = new Set(toc.map((t, i) => i).filter((i) => toc[i].page <= cur && cur <= (toc[i + 1] ? toc[i + 1].page - (toc[i + 1].lead ? 1 : 0) : Infinity)));
+  const onPage = toc.map((t, i) => i).filter((i) => toc[i].page === cur);
+  const lastBefore = toc.reduce((acc, t, i) => (t.page < cur ? i : acc), -1);
+  const activeSet = new Set(onPage.length ? onPage : lastBefore >= 0 ? [lastBefore] : []);
   const current = [...activeSet][0] ?? 0;
   const flip = (dir) => window.__akathistFlip?.(dir);
 

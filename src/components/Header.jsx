@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Button } from "@heroui/react";
 
 const NAV = [
+  { to: "/about", label: "О соборе" },
   { to: "/schedule", label: "Расписание" },
   { to: "/announcements", label: "Объявления" },
   { to: "/news", label: "Новости" },
@@ -53,8 +54,8 @@ export default function Header() {
       return undefined;
     }
     const onScroll = () => {
-      // как только страница тронулась с места — шапка плавно становится белой
-      setPastHero(window.scrollY > 0);
+      // после небольшой прокрутки (40px) шапка плавно становится белой
+      setPastHero(window.scrollY > 40);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });

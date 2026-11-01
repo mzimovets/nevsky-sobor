@@ -83,14 +83,12 @@ const LINK_GROUPS = [
         text: "Официальный сайт епархии: новости, приходы и объявления.",
         href: "https://volgeparhia.ru/",
         logo: "/links/volgeparhia.png",
-        tint: ["#d6e0f5", "#e9e1d0"],
       },
       {
         label: "Патриархия.ru",
         text: "Сайт Русской Православной Церкви: новости, документы, слово Патриарха.",
         href: "https://patriarchia.ru/",
         logo: "/links/patriarchia.png",
-        tint: ["#f4e2b0", "#eadbbd"],
       },
     ],
   },
@@ -103,14 +101,12 @@ const LINK_GROUPS = [
         text: "Полный текст службы на любой день года: удобно следить за богослужением.",
         href: "https://webtypikon.ru/",
         logo: "/links/webtypikon.svg",
-        tint: ["#f6d3cb", "#ecdacd"],
       },
       {
         label: "Последование.рф",
         text: "Тексты богослужений по датам: можно следить за службой и читать вместе.",
         href: "https://xn--80adfddrquddgz.xn--p1ai/",
         logo: "/links/posledovanie.png",
-        tint: ["#f2cbc4", "#ebd6cb"],
       },
     ],
   },
@@ -123,7 +119,6 @@ const LINK_GROUPS = [
         text: "Православная библиотека, молитвослов, календарь, жития святых.",
         href: "https://azbyka.ru/",
         logo: "/links/azbyka.svg",
-        tint: ["#e8c0bd", "#e8d4c8"],
         scale: 0.9,
       },
       {
@@ -131,7 +126,6 @@ const LINK_GROUPS = [
         text: "Православное радио онлайн: беседы, проповеди и музыка.",
         href: "https://radiovera.ru/",
         logo: "/links/radiovera.png",
-        tint: ["#c9e4f5", "#dfe2da"],
         scale: 0.95,
       },
     ],
@@ -157,7 +151,7 @@ function MapCard({ title, src }) {
 }
 
 const GOLD_TEXT =
-  "bg-gradient-to-r from-[#9b2316] via-[#d4574a] to-[#7a5524] bg-clip-text text-transparent";
+  "bg-gradient-to-b from-[#c0392b] to-[#7a1a10] bg-clip-text text-transparent";
 
 export default function Footer() {
   return (
@@ -172,14 +166,19 @@ export default function Footer() {
         </defs>
       </svg>
 
-      <div className="mx-auto my-10 flex w-[94%] flex-col gap-10 rounded-[2rem] border border-[#ece6e1] bg-[#ffffff] px-8 py-10 shadow-sm sm:px-14 lg:flex-row lg:items-center lg:justify-between lg:py-14">
+      <div className="notched gold-frame relative mx-auto my-10 flex w-[94%] flex-col gap-10 px-8 py-14 sm:px-16 lg:flex-row lg:items-center lg:justify-between lg:py-16" style={{ "--notch": "clamp(18px, 4.5vw, 26px)" }}>
+        {/* кресты по углам рамки: на телефоне вырез и кресты меньше, чтобы кресты лежали внутри, а не на рамке */}
+        {[
+          "left-7 top-7 sm:left-9 sm:top-9",
+          "right-7 top-7 sm:right-9 sm:top-9",
+          "bottom-7 left-7 sm:bottom-9 sm:left-9",
+          "bottom-7 right-7 sm:bottom-9 sm:right-9",
+        ].map((pos) => (
+          <img key={pos} src="/ornaments/cross.webp" alt="" aria-hidden width="18" height="18" draggable={false} className={`pointer-events-none absolute h-3.5 w-3.5 select-none sm:h-[18px] sm:w-[18px] ${pos}`} />
+        ))}
         <div>
-          <Eyebrow className="flex items-center gap-4 text-xs uppercase text-[#9b2316]">
-            <span aria-hidden className="eb-dot">◇</span>
-            Подписывайтесь
-            <span className="eb-line hidden h-px w-24 bg-gradient-to-r from-[#9b2316] to-transparent sm:block" aria-hidden />
-          </Eyebrow>
-          <h2 style={{ textTransform: "uppercase" }} className="font-slovic mt-5 text-4xl leading-tight sm:text-5xl lg:text-6xl">
+          
+          <h2 style={{ textTransform: "uppercase" }} className="font-slovic text-4xl leading-tight sm:text-5xl lg:text-6xl">
             <RevealWords text="Мы в социальных сетях" wordClassName={GOLD_TEXT} />
           </h2>
           <p className="mt-5 max-w-md text-base leading-relaxed text-ink/80">
@@ -187,7 +186,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="flex gap-6 sm:gap-10">
+        <div className="flex justify-center gap-7 self-center sm:gap-12 lg:self-auto">
           {SOCIALS.map((s) => (
             <a
               key={s.label}
@@ -197,7 +196,7 @@ export default function Footer() {
               aria-label={s.label}
               className="group flex flex-col items-center gap-4"
             >
-              <span className="relative grid h-20 w-20 place-items-center overflow-hidden rounded-full border border-[#b8453a]/40 bg-white shadow-[0_0_0_0_rgba(155,35,22,0)] transition-[box-shadow,border-color,background-color] duration-500 ease-out group-hover:border-transparent group-hover:bg-[#d4574a] group-hover:shadow-[0_24px_34px_-18px_rgba(155,35,22,0.65)] sm:h-24 sm:w-24">
+              <span className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-full border border-[#b8453a]/40 bg-white shadow-[0_0_0_0_rgba(155,35,22,0)] transition-[box-shadow,border-color,background-color] duration-500 ease-out group-hover:border-transparent group-hover:bg-[#d4574a] group-hover:shadow-[0_24px_34px_-18px_rgba(155,35,22,0.65)] sm:h-28 sm:w-28">
                 <span
                   className="absolute -inset-px rounded-full bg-[radial-gradient(circle_at_30%_25%,#f6c4bc,#d4574a_45%,#9b2316)] scale-0 opacity-0 transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-100"
                   aria-hidden
@@ -210,7 +209,7 @@ export default function Footer() {
                   <path
                     transform={ICONS[s.icon].transform}
                     d={ICONS[s.icon].d}
-                    fill="url(#gold-icon)"
+                    fill="#9b2316"
                     className="transition-[fill] duration-500 group-hover:fill-white"
                   />
                 </svg>
@@ -297,17 +296,8 @@ export default function Footer() {
                     href={l.href}
                     target="_blank"
                     rel="noreferrer"
-                    style={{ "--lc-a": l.tint[0], "--lc-b": l.tint[1] }}
-                    className="lc lc-bg group relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-[#e3d6cf] p-4 transition-[border-color,box-shadow] duration-500 hover:border-[#d4574a] hover:shadow-[0_22px_40px_-22px_rgba(155,35,22,0.7)]"
+                    className="lc group relative flex flex-col items-center justify-start overflow-hidden rounded-3xl border border-[#ece6e1] bg-white p-5 shadow-sm transition-[border-color,box-shadow] duration-500 hover:border-[#d4574a] hover:shadow-[0_22px_40px_-24px_rgba(155,35,22,0.55)]"
                   >
-                    <span
-                      className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,0.6),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      aria-hidden
-                    />
-                    <span
-                      className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/80 to-transparent opacity-0 transition-[transform,opacity] duration-1000 ease-out group-hover:translate-x-[400%] group-hover:opacity-100"
-                      aria-hidden
-                    />
                     <span
                       className="absolute right-3.5 top-3.5 text-base leading-none text-[#b8453a] opacity-0 transition-[opacity,transform] duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
                       aria-hidden
@@ -326,7 +316,7 @@ export default function Footer() {
                       </span>
                     </span>
                     <span className="lc-text relative">
-                      <span className="block text-[12px] font-semibold uppercase leading-snug tracking-[0.08em] text-[#7a1a10]">{l.label}</span>
+                      <span className="lc-title text-[12px] font-semibold uppercase leading-snug tracking-[0.08em] text-[#7a1a10]">{l.label}</span>
                       <span className="mx-auto mt-2 block h-px w-10 bg-gradient-to-r from-transparent via-[#d4574a] to-transparent" aria-hidden />
                       <span className="mt-2 block text-[12.5px] leading-snug text-ink/75">{l.text}</span>
                     </span>

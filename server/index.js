@@ -2,6 +2,7 @@ import express from "express";
 import Datastore from "nedb";
 import * as cheerio from "cheerio";
 import multer from "multer";
+import sharp from "sharp";
 import fs from "fs";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -17,6 +18,7 @@ database.loadDatabase();
 
 app.use(
   express.static(__dirname + "/build", {
+    redirect: false, // /about — это и роут SPA, и папка с фото: без редиректа на /about/
     setHeaders: (res, filePath) => {
       if (/[\\/]assets[\\/]/.test(filePath)) {
         res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
@@ -41,7 +43,30 @@ const upload = multer({
   }),
   limits: { fileSize: 8 * 1024 * 1024 },
 });
-app.use("/uploads", express.static(uploadsDir));
+app.use("/uploads", express.static(uploadsDir, { maxAge: "30d", immutable: true }));
+
+// Загруженные картинки приходят как есть (PNG по 7 МБ с телефона) — это главная
+// причина медленных страниц. Ужимаем до 1600 px по длинной стороне и
+// отдаём WebP; исходник удаляем.
+async function optimizeUpload(file) {
+  const outName = file.filename.replace(/\.[a-zA-Z0-9]+$/, "") + ".webp";
+  await sharp(file.path)
+    .rotate()
+    .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 80 })
+    .toFile(uploadsDir + "/" + outName);
+  if (outName !== file.filename) fs.unlink(file.path, () => {});
+  return outName;
+}
+const uploadHandler = async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "Файл не получен" });
+  try {
+    res.json({ url: `/uploads/${await optimizeUpload(req.file)}` });
+  } catch {
+    // не картинка / битый файл — отдаём как загрузили
+    res.json({ url: `/uploads/${req.file.filename}` });
+  }
+};
 
 // Расписание берём с публичного сайта-редактора и кэшируем в NeDB: если
 // источник недоступен, отдаём последнюю сохранённую копию, а не ошибку —
@@ -66,23 +91,59 @@ async function getUpstream() {
   return lastFetch.promise;
 }
 
-app.get("/api/schedule", async (req, res) => {
-  try {
-    const doc = await getUpstream();
-    if (!doc) throw new Error("empty upstream response");
-    database.update(
-      { _id: "schedule" },
-      { $set: { data: doc.data, meta: doc.meta, updatedAt: doc.updatedAt, cachedAt: Date.now() } },
-      { upsert: true },
-      () => {}
-    );
-    return res.json({ ...doc, stale: false });
-  } catch (err) {
-    database.findOne({ _id: "schedule" }, (dbErr, cached) => {
-      if (cached) return res.json({ ...cached, stale: true });
-      res.status(503).json({ error: "Расписание недоступно" });
+// Расписание отдаём МГНОВЕННО из базы, а свежую копию подтягиваем с источника
+// в фоне (по запросу и раз в 30 с) — посетитель не ждёт чужой сайт. Если в базе
+// ещё ничего нет (самый первый запуск) — ждём источник.
+let scheduleRefresh = null;
+function refreshSchedule() {
+  if (scheduleRefresh) return scheduleRefresh;
+  scheduleRefresh = getUpstream()
+    .then((doc) => {
+      if (!doc || !doc.data) return null;
+      database.update(
+        { _id: "schedule" },
+        { $set: { data: doc.data, meta: doc.meta, updatedAt: doc.updatedAt, cachedAt: Date.now() } },
+        { upsert: true },
+        () => {}
+      );
+      return doc;
+    })
+    .catch(() => null)
+    .finally(() => {
+      scheduleRefresh = null;
     });
-  }
+  return scheduleRefresh;
+}
+
+app.get("/api/schedule", (req, res) => {
+  database.findOne({ _id: "schedule" }, async (err, cached) => {
+    if (cached) {
+      refreshSchedule();
+      return res.json({ data: cached.data, meta: cached.meta, updatedAt: cached.updatedAt, stale: false });
+    }
+    const doc = await refreshSchedule();
+    if (doc) return res.json({ ...doc, stale: false });
+    res.status(503).json({ error: "Расписание недоступно" });
+  });
+});
+
+// Редактор расписания (schedule.nevsky-sobor.ru) по кнопке «Опубликовать»
+// присылает расписание сюда. Принимаем только с верным ключом PUBLISH_KEY.
+app.post("/api/schedule-publish", express.json({ limit: "5mb" }), (req, res) => {
+  const key = process.env.PUBLISH_KEY;
+  if (!key || req.get("x-publish-key") !== key) return res.status(401).json({ error: "forbidden" });
+  const { data, meta, updatedAt } = req.body || {};
+  if (!Array.isArray(data)) return res.status(400).json({ error: "bad data" });
+  database.update(
+    { _id: "schedule" },
+    { $set: { data, meta, updatedAt, cachedAt: Date.now() } },
+    { upsert: true },
+    (err) => {
+      if (err) return res.status(500).json({ error: "save failed" });
+      res.json({ status: "ok" });
+      warmDayInfo();
+    }
+  );
 });
 
 // ── День церковного календаря (страница /day/:date) ──────────────────────
@@ -537,6 +598,82 @@ app.get("/api/day-info", (req, res) => {
   });
 });
 
+// ── Толкования на стих ───────────────────────────────────────────────────
+// https://azbyka.ru/biblia/in/?Мф.5:3 — толкования святых отцов и богословов на
+// один стих. Разбираем страницу в список {автор, текст, источник}, разметку
+// чистим (оставляем только абзацы и выделение, без ссылок и скриптов) и
+// кладём в базу: толкования не меняются, повторно на сайт не ходим.
+const VERSE_REF_RE = /^[A-Za-z0-9]+\.\d{1,3}:\d{1,3}$/;
+const COMMENT_TAGS = new Set(["p", "strong", "b", "em", "i", "br", "sup", "sub", "blockquote"]);
+
+function cleanCommentHtml($, root) {
+  const clean = (node) => {
+    $(node)
+      .contents()
+      .each((_, child) => {
+        if (child.type === "text") return;
+        if (child.type !== "tag") {
+          $(child).remove();
+          return;
+        }
+        const name = child.tagName.toLowerCase();
+        if (["script", "style", "iframe", "img", "svg"].includes(name)) {
+          $(child).remove();
+          return;
+        }
+        clean(child);
+        if (COMMENT_TAGS.has(name)) child.attribs = {};
+        else $(child).replaceWith($(child).contents());
+      });
+  };
+  clean(root);
+  return $(root).html().replace(/\s+/g, " ").trim();
+}
+
+async function loadVerseCommentary(ref) {
+  const res = await fetchWithRetry(`https://azbyka.ru/biblia/in/?${ref}`);
+  const $ = cheerio.load(await res.text());
+  const items = [];
+  $(".interpretation").each((_, el) => {
+    const block = $(el);
+    const author = block.find("h2").first().clone().children().remove().end().text().replace(/\s+/g, " ").trim();
+    const content = block.find(".interp-content").first();
+    if (!author || !content.length) return;
+    const html = cleanCommentHtml($, content);
+    if (!stripTags(html)) return;
+    const src = block.find(".interp-src a").first();
+    const href = src.attr("href") || "";
+    items.push({
+      author,
+      html,
+      source: src.length ? { title: src.text().replace(/\s+/g, " ").trim(), url: /^https:\/\/azbyka\.ru\//.test(href) ? href : null } : null,
+    });
+  });
+  return { ref, url: `https://azbyka.ru/biblia/in/?${ref}`, items };
+}
+
+const commentaryInflight = new Map();
+app.get("/api/verse-commentary", (req, res) => {
+  const ref = String(req.query.ref || "");
+  if (!VERSE_REF_RE.test(ref)) return res.status(400).json({ error: "Некорректная ссылка на стих" });
+  const id = `verse-comm-v1:${ref}`;
+  database.findOne({ _id: id }, async (err, cached) => {
+    if (cached) return res.json(cached.data);
+    try {
+      let job = commentaryInflight.get(ref);
+      if (!job) {
+        job = loadVerseCommentary(ref).finally(() => commentaryInflight.delete(ref));
+        commentaryInflight.set(ref, job);
+      }
+      const data = await job;
+      database.update({ _id: id }, { $set: { data, cachedAt: Date.now() } }, { upsert: true }, () => {});
+      res.json(data);
+    } catch {
+      res.status(503).json({ error: "Толкования сейчас недоступны" });
+    }
+  });
+});
+
 // Объявления на главной («истории») — без авторизации, как и остальные
 // редакторы в проекте: хранятся в общей NeDB с type: "announcement",
 // полем order (порядок в ленте, меняется перетаскиванием в админке — см.
@@ -627,10 +764,7 @@ app.post("/api/announcements/reorder", express.json(), (req, res) => {
   });
 });
 
-app.post("/api/announcements/upload", upload.single("image"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Файл не получен" });
-  res.json({ url: `/uploads/${req.file.filename}` });
-});
+app.post("/api/announcements/upload", upload.single("image"), uploadHandler);
 
 // Новости — та же схема без авторизации, что и объявления выше: общая
 // NeDB, type: "news". В отличие от объявлений порядок не перетаскиваемый
@@ -732,10 +866,7 @@ app.delete("/api/news/:id", (req, res) => {
   });
 });
 
-app.post("/api/news/upload", upload.single("image"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Файл не получен" });
-  res.json({ url: `/uploads/${req.file.filename}` });
-});
+app.post("/api/news/upload", upload.single("image"), uploadHandler);
 
 // Счётчик просмотров — страница статьи (NewsArticlePage.jsx) шлёт сюда раз
 // за сессию (см. sessionStorage-отметку там же), $inc — атомарный инкремент
@@ -795,6 +926,8 @@ async function warmDayInfo() {
 
 app.listen(PORT, () => {
   console.log("sobor server on " + PORT);
+  refreshSchedule();
+  setInterval(refreshSchedule, 30000).unref();
   setTimeout(warmDayInfo, 5000);
   setInterval(warmDayInfo, WARM_EVERY_MS).unref();
 });

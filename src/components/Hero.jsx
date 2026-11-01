@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Button } from "@heroui/react";
 import { smoothScrollToId } from "../lib/smoothScroll.js";
 
 const PinIcon = () => (
@@ -39,17 +38,11 @@ const INFO = [
   { label: "Телефон", value: "+7 996 510 90 90", icon: <PhoneIcon />, tel: "+79965109090" },
 ];
 
-// Небольшой четырёхконечный крест со стрелками на концах — украшение разделителей.
+// Декоративный крест на разделителях панели — контурный, с белой серединой
+// (public/ornaments/cross-outline.webp).
 const CrossMark = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 3v18M3 12h18" />
-    <path d="M9.5 5.5 12 3l2.5 2.5M9.5 18.5 12 21l2.5-2.5M5.5 9.5 3 12l2.5 2.5M18.5 9.5 21 12l-2.5 2.5" />
-    <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
-  </svg>
+  <img src="/ornaments/cross-outline.webp" alt="" aria-hidden width="22" height="22" className="block h-[22px] w-[22px] select-none" draggable={false} />
 );
-
-const scrollToContent = () =>
-  document.getElementById("home-content")?.scrollIntoView({ behavior: "smooth" });
 
 export default function Hero() {
   return (
@@ -70,18 +63,14 @@ export default function Hero() {
         </h1>
         <p className="mt-5 text-sm uppercase tracking-[0.4em] text-ink/70">Волгоград</p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Button
-            onPress={scrollToContent}
-            className="shimmer-gold h-12 rounded-full px-8 text-xs uppercase tracking-[0.2em] text-white shadow-lg"
-          >
+          <Link to="/about" className="shimmer-gold h-12 rounded-full px-8 text-xs uppercase tracking-[0.2em] text-white shadow-lg inline-flex items-center">
             О соборе
-          </Button>
-          <Link
-            to="/schedule"
-            className="flex h-12 items-center gap-2.5 rounded-full border border-[#9b2316]/60 bg-white/60 px-7 text-xs uppercase tracking-[0.2em] text-[#9b2316] backdrop-blur transition-colors hover:bg-[#9b2316] hover:text-white"
-          >
-            <CalendarIcon /> Расписание
           </Link>
+          {/* Не уводит на отдельную страницу, а плавно листает вниз к блоку
+              расписания на главной (с отступом под фиксированную шапку). */}
+          <button type="button" onClick={() => smoothScrollToId("schedule", { offset: 96 })} className="flex h-12 items-center gap-2.5 rounded-full border border-[#9b2316]/60 bg-white/60 px-7 text-xs uppercase tracking-[0.2em] text-[#9b2316] backdrop-blur transition-colors hover:bg-[#9b2316] hover:text-white">
+            <CalendarIcon /> Расписание
+          </button>
         </div>
       </div>
 
@@ -112,7 +101,7 @@ export default function Hero() {
                   aria-hidden
                   className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-[#9b2316]/20 sm:block [mask-image:linear-gradient(to_bottom,#000_0,#000_calc(50%-16px),transparent_calc(50%-16px),transparent_calc(50%+16px),#000_calc(50%+16px),#000_100%)]"
                 />
-                <span aria-hidden className="pointer-events-none absolute left-0 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 text-[#9b2316]/80 sm:block">
+                <span aria-hidden className="pointer-events-none absolute left-0 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 sm:block">
                   <CrossMark />
                 </span>
               </>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { dayISODate, dayStatus, todayIndex } from "../lib/scheduleDate.js";
 import { parseServices } from "../lib/services.js";
 import { Eyebrow, RevealWords } from "./Reveal.jsx";
+import PosterOverlay from "./PosterOverlay.jsx";
 
 const MONTHS_NOM = [
   "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -29,7 +30,7 @@ const GOLD_TEXT = "bg-gradient-to-b from-[#c0392b] to-[#7a1a10] bg-clip-text tex
 // Блок «Расписание» на главной в стиле sobormihailsochi.ru: крупная карточка
 // сегодняшнего дня и лента карточек дней (прошедшие приглушены, сегодняшняя
 // тёмная) с горизонтальной прокруткой, кнопками и полоской прогресса.
-export default function DaySchedule({ days }) {
+export default function DaySchedule({ days, fontSize }) {
   const sliderRef = useRef(null);
   const [edges, setEdges] = useState({ start: true, end: true });
   const initializedRef = useRef(false);
@@ -149,7 +150,7 @@ export default function DaySchedule({ days }) {
   const todayFeast = stripHtml(today.saintsOfDay);
 
   return (
-    <section className="w-full overflow-x-clip px-6 py-12 [--pad:1.5rem] sm:px-10 sm:[--pad:2.5rem]">
+    <section id="schedule" className="w-full overflow-x-clip px-6 py-12 [--pad:1.5rem] sm:px-10 sm:[--pad:2.5rem]">
       <div className="mx-auto max-w-[1700px]">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
@@ -319,15 +320,16 @@ export default function DaySchedule({ days }) {
         </div>
 
         <div className="mt-8 flex justify-center">
-          <Link
-            to="/schedule"
-            className="inline-flex items-center gap-3 rounded-full border border-ink/20 px-7 py-4 text-[10px] font-medium uppercase tracking-[0.2em] text-ink transition-colors hover:border-[#b8453a] hover:bg-[#b8453a]/10 hover:text-[#9b2316]"
+          <PosterOverlay
+            days={days}
+            fontSize={fontSize}
+            className="inline-flex cursor-pointer items-center gap-3 rounded-full border border-ink/20 px-7 py-4 text-[10px] font-medium uppercase tracking-[0.2em] text-ink transition-colors hover:border-[#b8453a] hover:bg-[#b8453a]/10 hover:text-[#9b2316]"
           >
             <span className="text-[#b8453a]">
               <DocIcon />
             </span>
             Подробное расписание на неделю
-          </Link>
+          </PosterOverlay>
         </div>
       </div>
     </section>

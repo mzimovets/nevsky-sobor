@@ -433,49 +433,18 @@ h3 {
 /* Слова Спасителя в чтениях (DayPage.jsx) */
 .christ-scope em.christ { font-style: normal; color: #9a1b1b; }
 
-/* Карточки «Полезных ссылок» (Footer.jsx): в покое — только крупный значок по
-   центру, при наведении под ним плавно «вырастает» название с пояснением, а
-   значок уменьшается и остаётся по центру оставшегося места — текст никогда не
-   наезжает на картинку. На устройствах без наведения (телефон) текст виден
-   всегда. */
-.lc-stage { flex: 1; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr); place-items: center; width: 100%; }
-.lc-text { text-align: center; margin-top: 0.75rem; }
-@media (hover: hover) {
-  .lc { padding: 0.75rem; aspect-ratio: 1 / 1; }
-  .lc-logo { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); transform: scale(1.12); }
-  .lc-text {
-    margin-top: 0;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, margin-top 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .lc:hover .lc-logo,
-  .lc:focus-visible .lc-logo { transform: scale(0.52); }
-  .lc:hover .lc-text,
-  .lc:focus-visible .lc-text { max-height: 8rem; margin-top: 0.25rem; opacity: 1; transition-delay: 0s, 0.1s, 0s; }
-}
-@media (hover: none) {
-  .lc { min-height: 14rem; }
-  .lc-logo { transform: none; }
-}
-
-/* Фон карточек «Полезных ссылок»: тёплый градиент с цветным пятном под цвет
-   значка (--lc-a/--lc-b задаются в Footer.jsx) и мягким кругом за значком. */
-.lc-bg {
-  background:
-    radial-gradient(120% 90% at 18% 0%, var(--lc-a) 0%, transparent 62%),
-    linear-gradient(165deg, #f8f0e3 0%, var(--lc-b) 100%);
-}
-.lc-logo::before {
-  content: "";
-  position: absolute;
-  inset: -16px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.35) 55%, transparent 72%);
-  border: 1px solid rgba(184, 69, 58, 0.28);
-}
-.lc-logo img { position: relative; }
+/* Карточки «Полезных ссылок» (Footer.jsx): значок и под ним название с
+   пояснением — всегда, без появления по наведению; фон белый, как у остальных
+   карточек сайта. */
+/* Значок в рамке фиксированной высоты, под ним текст от одной и той же линии —
+   заголовки всех карточек стоят на одном уровне. */
+.lc-stage { flex: none; height: 7.5rem; display: grid; place-items: center; width: 100%; }
+.lc-text { text-align: center; margin-top: 0.75rem; width: 100%; }
+.lc-title { display: flex; align-items: flex-start; justify-content: center; min-height: 2.4em; }
+/* Все карточки одной высоты — независимо от длины текста. */
+.lc { height: 19.5rem; }
+.lc-logo { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.lc:hover .lc-logo, .lc:focus-visible .lc-logo { transform: scale(1.05); }
 
 /* Карточка Евангелия на странице дня (DayPage.jsx) — те же подъём, наклон и
    золотая обводка, что у карточек расписания; обводка рисуется внутри
@@ -519,20 +488,10 @@ h3 {
   50% { scale: 1.4; box-shadow: 0 0 0 9px rgba(155, 35, 22, 0); }
 }
 .toc-dot-active { animation: toc-breathe 2.8s ease-in-out infinite; }
-@keyframes toc-metal {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-/* полированное золото: блики разной яркости лежат полосами и медленно плывут */
+/* Текущий раздел в оглавлении — ровная бордовая заливка без перелива. */
 .toc-glint {
-  background-image: linear-gradient(
-    112deg,
-    #6a160d 0%, #a67c36 14%, #e8cb86 24%, #b48a40 33%, #6a160d 46%,
-    #a77d37 58%, #dcbb74 68%, #8f6a2c 80%, #6a160d 100%
-  );
-  background-size: 260% 100%;
-  animation: toc-metal 9s ease-in-out infinite alternate;
-  text-shadow: 0 1px 2px rgba(50, 30, 5, 0.65);
+  background-image: linear-gradient(180deg, #b3382a, #8a1f14);
+  text-shadow: 0 1px 2px rgba(50, 10, 5, 0.4);
 }
 @media (prefers-reduced-motion: reduce) {
   .toc-dot-active, .toc-glint { animation: none; }
@@ -568,3 +527,29 @@ h3 {
 .copy-btn:hover .copy-hl, .copy-btn:focus-visible .copy-hl { background-size: 100% 2px; }
 .copy-btn:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) { .copy-hl { transition: none; } }
+
+/* Стихи в чтениях (DayPage.jsx): при наведении под строками стиха плавно
+   проявляется пунктир; по нажатию открывается толкование. Подчёркивание
+   прозрачное в покое и красное при наведении, поэтому ложится под каждую строку. */
+.verse-row { cursor: pointer; border-radius: 6px; outline: none; }
+.verse-line {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 7px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.45s ease;
+}
+.verse-row:hover .verse-line,
+.verse-row:focus-visible .verse-line { text-decoration-color: rgba(155, 35, 22, 0.65); }
+@media (prefers-reduced-motion: reduce) { .verse-line { transition: none; } }
+
+/* Текст толкования: абзацы с воздухом */
+.commentary-text p { margin: 0 0 0.9em; }
+.commentary-text p:last-child { margin-bottom: 0; }
+.commentary-text blockquote { margin: 0.8em 0; padding-left: 1rem; border-left: 2px solid #ece6e1; color: rgba(43, 35, 38, 0.8); }
+
+/* Страница «О соборе»: мягкое появление блока при переключении */
+@keyframes era-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.era-in { animation: era-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) { .era-in { animation: none; } }

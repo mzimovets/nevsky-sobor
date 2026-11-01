@@ -5,8 +5,12 @@ import { useDayInfo } from "../lib/useDayInfo.js";
 import { dayISODate, dayStatus, todayIndex } from "../lib/scheduleDate.js";
 import { parseServices } from "../lib/services.js";
 import { Eyebrow, RevealWords } from "../components/Reveal.jsx";
+import VerseCommentary from "../components/VerseCommentary.jsx";
 
 const MONTHS = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+// Сокращения дней недели для ленты дней: вс пн вт ср чт пт сб.
+const WEEKDAY_SHORT = { воскресенье: "вс", понедельник: "пн", вторник: "вт", среда: "ср", четверг: "чт", пятница: "пт", суббота: "сб" };
+const weekdayShort = (name) => WEEKDAY_SHORT[(name || "").trim().toLowerCase()] || (name || "").slice(0, 2);
 const WEEKDAYS = ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"];
 const SANCTITY = {
   "прор.": "Пророк", "прмч.": "Преподобномученик", "прп.": "Преподобный", "мч.": "Мученик", "прав.": "Праведный",
@@ -181,10 +185,20 @@ function SaintsPanel({ day, info, loading }) {
 
 // Чтение с раскрытием: слева церковнославянский, справа русский — по стихам,
 // одним шрифтом и размером, с золотым разделителем посередине.
-function ReadingCard({ reading }) {
+function ReadingCard({ reading, onVerse }) {
   const [open, setOpen] = useState(false);
   const style = KIND_STYLE[reading.kind] || KIND_STYLE["Ветхий Завет"];
   const hasCs = reading.verses?.some((v) => v.cs);
+  // Описание стиха для окна с толкованием: окно листает стихи этого чтения.
+  const verseDesc = (v) => ({
+    ref: `${reading.ref.split(".")[0]}.${v.c}:${v.n}`,
+    n: v.n,
+    chapter: v.c,
+    abbr: `${reading.label.split(".")[0]}.`,
+    bookTitle: reading.bookTitle,
+    text: cleanVerse(v.ru),
+  });
+  const openVerse = (i) => onVerse?.({ verses: reading.verses.map(verseDesc), index: i });
   const decor = FANCY[reading.kind];
   const fancy = Boolean(decor);
   // Подъём, наклон к курсору и золотая обводка — те же, что у карточек
@@ -309,18 +323,31 @@ function ReadingCard({ reading }) {
                     <span aria-hidden className="pointer-events-none absolute left-1/2 top-0 hidden -translate-x-1/2 bg-[#ffffff] px-2 text-[#d4574a] md:block">◇</span>
                   </>
                 )}
+                <p className="mb-4 text-xs text-ink/50">Нажмите на стих — откроется толкование.</p>
                 <div className="flex flex-col gap-5">
-                  {reading.verses.map((v) => (
-                    <div key={`${v.c}:${v.n}`} className={`grid gap-x-16 gap-y-2 ${hasCs ? "md:grid-cols-2" : ""}`}>
+                  {reading.verses.map((v, vi) => (
+                    <div
+                      key={`${v.c}:${v.n}`}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Толкование на стих ${v.n}`}
+                      onClick={() => openVerse(vi)}
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter" && e.key !== " ") return;
+                        e.preventDefault();
+                        openVerse(vi);
+                      }}
+                      className={`verse-row grid gap-x-16 gap-y-2 ${hasCs ? "md:grid-cols-2" : ""}`}
+                    >
                       {hasCs && (
                         <p className={verseText}>
                           <sup className="mr-1.5 font-sans text-[11px] font-semibold" style={{ color: style.accent }}>{v.n}</sup>
-                          <span className="christ-scope" dangerouslySetInnerHTML={{ __html: cleanVerse(v.cs || "") }} />
+                          <span className="christ-scope verse-line" dangerouslySetInnerHTML={{ __html: cleanVerse(v.cs || "") }} />
                         </p>
                       )}
                       <p className={`${verseText} ${hasCs ? "border-l-2 border-[#ece6e1] pl-4 md:border-l-0 md:pl-0" : ""}`}>
                         <sup className="mr-1.5 font-sans text-[11px] font-semibold" style={{ color: style.accent }}>{v.n}</sup>
-                        <span className="christ-scope" dangerouslySetInnerHTML={{ __html: cleanVerse(v.ru) }} />
+                        <span className="christ-scope verse-line" dangerouslySetInnerHTML={{ __html: cleanVerse(v.ru) }} />
                       </p>
                     </div>
                   ))}
@@ -345,6 +372,9 @@ export default function DayPage() {
   const { loading: scheduleLoading, days } = useLiveSchedule();
   const { loading, error, info } = useDayInfo(date);
   const stripRef = useRef(null);
+  const [sel, setSel] = useState(null); // {verses, index}: стихи чтения и открытый среди них
+  const verse = sel ? sel.verses[sel.index] : null;
+  const step = (d) => setSel((c) => (c && c.verses[c.index + d] ? { ...c, index: c.index + d } : c));
 
   const entries = useMemo(() => days.map((d) => ({ day: d, iso: dayISODate(d) })), [days]);
   const idx = entries.findIndex((e) => e.iso === date);
@@ -368,6 +398,9 @@ export default function DayPage() {
 
   return (
     <div className="mx-auto w-[94%] max-w-[1180px] pb-8 pt-8">
+      <h2 style={{ textTransform: "uppercase" }} className={`font-slovic mb-6 text-center text-4xl leading-none sm:text-5xl ${GOLD_TEXT}`}>
+        Расписание
+      </h2>
       <Link to="/" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink/60 transition-colors hover:text-maroon">
         <Arrow dir="left" /> На главную
       </Link>
@@ -383,10 +416,11 @@ export default function DayPage() {
           >
             <Arrow dir="left" />
           </Link>
-          <div ref={stripRef} className="flex flex-1 gap-2 overflow-x-auto py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div ref={stripRef} className="flex flex-1 gap-2 overflow-x-auto py-1 [&>*:first-child]:ml-auto [&>*:last-child]:mr-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {entries.map(({ day: d, iso }) => {
               const active = iso === date;
               const status = dayStatus(d);
+              const sunday = weekdayShort(d.dayWeek) === "вс"; // воскресенье — светло-красным
               return (
                 <Link
                   key={iso}
@@ -395,12 +429,18 @@ export default function DayPage() {
                   className={`flex w-[68px] shrink-0 flex-col items-center rounded-2xl border px-2 py-2.5 transition-all duration-500 ${
                     active
                       ? "border-maroon-dark bg-maroon-dark text-[#efe7d8] shadow-lg"
-                      : "border-[#ece6e1] bg-white/70 text-ink hover:border-[#b8453a] hover:bg-white"
-                  } ${status === "past" && !active ? "opacity-60" : ""}`}
+                      : sunday
+                        ? "border-[#f1c4bc] bg-[#fbe6e2] text-ink hover:border-[#d4574a] hover:bg-[#fcdcd6]"
+                        : "border-[#ece6e1] bg-white/70 text-ink hover:border-[#b8453a] hover:bg-white"
+                  } ${status === "past" && !active ? "opacity-60" : ""} ${status === "today" ? "ring-2 ring-[#9b2316] ring-offset-2 ring-offset-[#fbf9f7] shadow-[0_10px_24px_-12px_rgba(155,35,22,0.65)]" : ""}`}
                 >
                   <span className={`font-serif-hero text-2xl leading-none ${active ? "text-[#e8a79e]" : "text-[#9b2316]"}`}>{d.dateWeek}</span>
-                  <span className={`mt-1 text-[9px] uppercase tracking-[0.16em] ${active ? "text-[#efe7d8]/70" : "text-muted"}`}>{(d.dayWeek || "").slice(0, 2)}</span>
-                  {status === "today" && <span className="mt-1.5 h-1 w-1 rounded-full bg-[#e8a79e]" />}
+                  <span className={`mt-1 text-[9px] uppercase tracking-[0.16em] ${active ? "text-[#efe7d8]/70" : "text-muted"}`}>{weekdayShort(d.dayWeek)}</span>
+                  {status === "today" && (
+                    <span className={`mt-1.5 rounded-full px-1.5 py-0.5 text-[8px] font-semibold uppercase leading-none tracking-[0.12em] ${active ? "bg-white/20 text-white" : "bg-[#9b2316] text-white"}`}>
+                      сегодня
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -505,7 +545,7 @@ export default function DayPage() {
                 )}
                 <div className="flex flex-col gap-4">
                   {g.readings.map((r) => (
-                    <ReadingCard key={`${g.key}-${r.ref || r.label}`} reading={r} />
+                    <ReadingCard key={`${g.key}-${r.ref || r.label}`} reading={r} onVerse={setSel} />
                   ))}
                 </div>
                 {g.notes?.map((n) => (
@@ -525,6 +565,14 @@ export default function DayPage() {
           Этого дня нет в расписании собора, поэтому показан только церковный календарь.
         </p>
       )}
+
+      <VerseCommentary
+        verse={verse}
+        prev={sel?.verses[sel.index - 1] || null}
+        next={sel?.verses[sel.index + 1] || null}
+        onStep={step}
+        onClose={() => setSel(null)}
+      />
     </div>
   );
 }
