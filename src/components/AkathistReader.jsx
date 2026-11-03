@@ -9,9 +9,8 @@ import { akathist, akathistSections } from "../data/akathist.js";
 const TEXT_FONT = "font-serif-hero";
 const PAGE_BG = "bg-white";
 const GOLD_TEXT = "bg-gradient-to-b from-[#c0392b] to-[#7a1a10] bg-clip-text text-transparent";
-// Место чтения держим только в памяти страницы: закрыли и снова открыли —
-// продолжаем, а после перезагрузки страницы акафист начинается сначала.
-let lastFrac = 0;
+// Акафист всегда открывается с начала; место чтения помним только пока открыто окно
+// (чтобы при смене размера окна и перепаговании не потерять страницу).
 const HINT_KEY = "akathist-alexander-nevsky:hint-seen";
 const FLIP_MS = 850;
 
@@ -293,7 +292,7 @@ function Book({ onProgress, onToc }) {
   const fracRef = useRef(null);
   useEffect(() => {
     if (!N) return;
-    if (fracRef.current == null) fracRef.current = Math.min(1, Math.max(0, lastFrac));
+    if (fracRef.current == null) fracRef.current = 0;
     setPos(Math.round(fracRef.current * (N - 1)));
   }, [N]);
 
@@ -301,7 +300,6 @@ function Book({ onProgress, onToc }) {
     if (pos == null || !N) return;
     const frac = N > 1 ? pos / (N - 1) : 0;
     fracRef.current = frac;
-    lastFrac = frac;
     onProgress?.({ page: pos + 1, total: N, frac });
   }, [pos, N, onProgress]);
 
