@@ -47,7 +47,7 @@ export default function Poster({ days, fontSize = "17px" }) {
     <div className="poster">
       <div className="font-serif">
         <div className="f-img-block">
-          <img src="/poster/background.png" alt="" />
+          <img src="/poster/background.webp" alt="" />
           <table className="schedule-table" style={{ fontSize }}>
             <tbody>
               <tr>

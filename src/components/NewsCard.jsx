@@ -94,7 +94,7 @@ export default function NewsCard({ item, large = false }) {
         </div>
 
         <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
-          <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-[#9b2316]">
+          <div className="flex items-center gap-3 text-[0.6875rem] uppercase tracking-[0.18em] text-[#9b2316]">
             <span>{formatNewsDate(item.publishedAt)}</span>
             <span aria-hidden className="h-px flex-1 bg-gradient-to-r from-[#d4574a]/60 to-transparent" />
             <span className="flex items-center gap-1 tracking-normal text-ink/50">

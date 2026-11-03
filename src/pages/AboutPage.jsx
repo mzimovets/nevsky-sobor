@@ -45,7 +45,7 @@ function SectionTitle({ eyebrow, title }) {
 function Credit({ photo, className = "" }) {
   if (!photo) return null;
   return (
-    <p className={`text-[11px] leading-snug text-ink/50 ${className}`}>
+    <p className={`text-[0.6875rem] leading-snug text-ink/50 ${className}`}>
       {photo.credit}, {photo.license}
       {photo.page && (
         <>
@@ -81,11 +81,11 @@ function Eras() {
       </div>
       <div key={era.id} className="era-in mt-6 grid gap-8 rounded-[28px] border border-[#ece6e1] bg-white p-6 shadow-sm sm:p-10 lg:grid-cols-[1.4fr_1fr]">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.28em] text-[#9b2316]">{era.years}</p>
+          <p className="text-[0.6875rem] uppercase tracking-[0.28em] text-[#9b2316]">{era.years}</p>
           <h3 style={{ textTransform: "none" }} className="font-serif-hero mt-2 text-3xl leading-tight text-ink sm:text-4xl">
             {era.title}
           </h3>
-          <p className="mt-4 text-[17px] leading-relaxed text-ink/80">{era.text}</p>
+          <p className="mt-4 text-[1.0625rem] leading-relaxed text-ink/80">{era.text}</p>
         </div>
         <ul className="grid content-start gap-3">
           {era.facts.map((f) => (
@@ -141,10 +141,10 @@ function Timeline() {
               type="button"
               onClick={() => setI(idx)}
               aria-current={idx === i ? "true" : undefined}
-              className="group relative flex w-[88px] flex-col items-center gap-2 text-center"
+              className="group relative flex w-[5.5rem] flex-col items-center gap-2 text-center"
             >
-              <span className={`relative z-10 h-[22px] w-[22px] rounded-full border-2 transition-all duration-300 ${idx === i ? "scale-110 border-[#9b2316] bg-[#9b2316] shadow-[0_0_0_5px_rgba(155,35,22,0.18)]" : t.era === "tsaritsyn" ? "border-[#b8453a] bg-white group-hover:bg-[#fbe6e2]" : "border-[#7a1a10] bg-[#f6e9e6] group-hover:bg-[#fbe6e2]"}`} />
-              <span className={`text-[11px] leading-tight transition-colors ${idx === i ? "font-semibold text-[#9b2316]" : "text-ink/55 group-hover:text-ink"}`}>{t.date}</span>
+              <span className={`relative z-10 h-[1.375rem] w-[1.375rem] rounded-full border-2 transition-all duration-300 ${idx === i ? "scale-110 border-[#9b2316] bg-[#9b2316] shadow-[0_0_0_5px_rgba(155,35,22,0.18)]" : t.era === "tsaritsyn" ? "border-[#b8453a] bg-white group-hover:bg-[#fbe6e2]" : "border-[#7a1a10] bg-[#f6e9e6] group-hover:bg-[#fbe6e2]"}`} />
+              <span className={`text-[0.6875rem] leading-tight transition-colors ${idx === i ? "font-semibold text-[#9b2316]" : "text-ink/55 group-hover:text-ink"}`}>{t.date}</span>
             </button>
           ))}
         </div>
@@ -153,9 +153,9 @@ function Timeline() {
       {cur && (
         <div key={`${cur.date}-${cur.title}`} className="era-in mt-4 grid overflow-hidden rounded-[28px] border border-[#ece6e1] bg-white shadow-sm md:grid-cols-[1.1fr_1fr]">
           <div className="flex flex-col p-6 sm:p-9">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[#9b2316]">{cur.date}</p>
+            <p className="text-[0.6875rem] uppercase tracking-[0.28em] text-[#9b2316]">{cur.date}</p>
             <h3 style={{ textTransform: "none" }} className="font-serif-hero mt-2 text-3xl leading-tight text-ink">{cur.title}</h3>
-            <p className="mt-4 text-[17px] leading-relaxed text-ink/80">{cur.text}</p>
+            <p className="mt-4 text-[1.0625rem] leading-relaxed text-ink/80">{cur.text}</p>
             <div className="mt-auto flex items-center gap-3 pt-6">
               <button type="button" onClick={() => setI((n) => Math.max(0, n - 1))} disabled={i === 0} aria-label="Предыдущее событие" className="grid h-11 w-11 place-items-center rounded-full border border-[#9b2316]/40 text-[#9b2316] transition-colors hover:bg-[#9b2316] hover:text-white disabled:pointer-events-none disabled:opacity-30">
                 <Arrow dir="left" />
@@ -172,7 +172,7 @@ function Timeline() {
                 <img src={img(photo.slug)} alt={photo.caption} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent px-4 pb-3 pt-10">
                   <p className="text-sm text-white">{photo.caption}</p>
-                  <p className="text-[10px] text-white/70">{photo.credit}, {photo.license}</p>
+                  <p className="text-[0.625rem] text-white/70">{photo.credit}, {photo.license}</p>
                 </div>
               </>
             ) : (
@@ -252,8 +252,8 @@ function BeforeAfter() {
       >
         <img src={img(after.slug)} alt={after.caption} draggable={false} className="absolute inset-0 h-full w-full object-cover" />
         <img src={img(before.slug)} alt={before.caption} draggable={false} className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }} />
-        <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white">1915–1917</span>
-        <span className="pointer-events-none absolute right-4 top-4 rounded-full bg-black/55 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white">2021</span>
+        <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-black/55 px-3 py-1 text-[0.6875rem] uppercase tracking-[0.2em] text-white">1915–1917</span>
+        <span className="pointer-events-none absolute right-4 top-4 rounded-full bg-black/55 px-3 py-1 text-[0.6875rem] uppercase tracking-[0.2em] text-white">2021</span>
         <span className="pointer-events-none absolute inset-y-0 w-px bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.15)]" style={{ left: `${pos}%` }}>
           <span className="absolute left-1/2 top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white text-[#9b2316] shadow-lg">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" /></svg>
@@ -289,7 +289,7 @@ function Parts() {
             <div className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`} aria-hidden={!isOpen}>
               <div className="overflow-hidden">
                 <div className={`grid gap-6 border-t border-[#ece6e1] px-6 pb-6 pt-5 ${p.image ? "md:grid-cols-[1.3fr_1fr]" : ""}`}>
-                  <p className="text-[17px] leading-relaxed text-ink/80">{p.text}</p>
+                  <p className="text-[1.0625rem] leading-relaxed text-ink/80">{p.text}</p>
                   {p.image && <img src={img(p.image)} alt={p.title} loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover" />}
                 </div>
               </div>
@@ -414,7 +414,7 @@ function Videos() {
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto w-[94%] max-w-[1180px] pb-16 pt-8">
+    <div className="mx-auto w-[94%] max-w-[73.75rem] pb-16 pt-8">
       <nav aria-label="Навигация" className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-ink/55">
         <Link to="/" className="transition-colors hover:text-[#9b2316]">Главная</Link>
         <span aria-hidden className="text-[#d4574a]">◆</span>
@@ -426,7 +426,7 @@ export default function AboutPage() {
           <h1 style={{ textTransform: "uppercase" }} className="font-slovic text-5xl leading-[0.95] sm:text-6xl lg:text-7xl">
             <RevealWords text="О соборе" wordClassName={GOLD_TEXT} />
           </h1>
-          <p className="mt-6 max-w-2xl text-[19px] leading-relaxed text-ink/80">{INTRO}</p>
+          <p className="mt-6 max-w-2xl text-[1.1875rem] leading-relaxed text-ink/80">{INTRO}</p>
         </div>
         <figure className="overflow-hidden rounded-[28px] border border-[#ece6e1] bg-white shadow-sm">
           <img src={img("volgograd-2021")} alt="Собор Александра Невского в Волгограде" className="aspect-[4/3] w-full object-cover" />

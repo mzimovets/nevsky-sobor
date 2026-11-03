@@ -60,7 +60,7 @@ export default function RequisitesPage() {
             <dl className="mt-2">
               {sec.rows.map((r) => (
                 <div key={r.label} className="relative border-b border-[#9b2316]/20 py-5 last:border-b-0">
-                  <dt className="text-[11px] uppercase tracking-[0.3em] text-[#9b2316]">{r.label}</dt>
+                  <dt className="text-[0.6875rem] uppercase tracking-[0.3em] text-[#9b2316]">{r.label}</dt>
                   <dd className="mt-2 min-h-[1.75rem]">
                     {r.value && (
                       <button
@@ -75,7 +75,7 @@ export default function RequisitesPage() {
                   </dd>
                   <span
                     role="status"
-                    className={`pointer-events-none absolute right-0 top-4 rounded-full bg-[#9b2316] px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white transition-all duration-300 ${
+                    className={`pointer-events-none absolute right-0 top-4 rounded-full bg-[#9b2316] px-3 py-1 text-[0.6875rem] uppercase tracking-[0.2em] text-white transition-all duration-300 ${
                       copied === r.label ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
                     }`}
                   >

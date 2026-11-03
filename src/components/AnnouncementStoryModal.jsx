@@ -5,7 +5,7 @@ const STORY_MS = 5000;
 // Общая высота-рамка для пиков соседних историй (объекты разных пропорций
 // внутри — object-cover, см. ниже) — держится в vh, чтобы расти вместе с
 // экраном так же, как и открытая история.
-const PEEK_CLASS = "hidden aspect-[9/16] shrink-0 sm:block sm:h-[58vh] sm:max-h-[560px]";
+const PEEK_CLASS = "hidden aspect-[9/16] shrink-0 sm:block sm:h-[58vh] sm:max-h-[35rem]";
 
 const CloseIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">

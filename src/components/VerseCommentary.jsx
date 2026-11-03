@@ -87,7 +87,7 @@ export default function VerseCommentary({ verse: incoming, prev, next, onStep, o
             </Drawer.CloseTrigger>
 
             <div className="shrink-0 px-6 pb-4 pt-6 pr-16 sm:px-9 sm:pr-20">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-[#9b2316]">
+              <p className="text-[0.6875rem] uppercase tracking-[0.24em] text-[#9b2316]">
                 {verse?.bookTitle || "Толкование"}
               </p>
               <Drawer.Heading style={{ fontFamily: "inherit", textTransform: "none", letterSpacing: 0 }} className="mt-1.5 font-serif-hero text-[1.9rem] font-medium leading-tight text-ink">
@@ -96,7 +96,7 @@ export default function VerseCommentary({ verse: incoming, prev, next, onStep, o
               </Drawer.Heading>
               {verse?.text && (
                 <p
-                  className="mt-3 border-l-2 border-[#d4574a]/60 pl-4 font-serif-hero text-[17px] italic leading-snug text-ink/75"
+                  className="mt-3 border-l-2 border-[#d4574a]/60 pl-4 font-serif-hero text-[1.0625rem] italic leading-snug text-ink/75"
                   dangerouslySetInnerHTML={{ __html: verse.text }}
                 />
               )}
@@ -111,7 +111,7 @@ export default function VerseCommentary({ verse: incoming, prev, next, onStep, o
                       type="button"
                       onClick={() => setPicked(i)}
                       aria-pressed={i === picked}
-                      className={`shrink-0 rounded-full border px-4 py-2 text-[13px] transition-colors ${
+                      className={`shrink-0 rounded-full border px-4 py-2 text-[0.8125rem] transition-colors ${
                         i === picked ? "border-[#9b2316] bg-[#9b2316] text-white" : "border-[#e3d6cf] bg-white text-ink/80 hover:border-[#d4574a] hover:text-[#9b2316]"
                       }`}
                     >
@@ -142,7 +142,7 @@ export default function VerseCommentary({ verse: incoming, prev, next, onStep, o
               {!loading && !error && data && items.length === 0 && <p className="text-ink/60">Толкований на этот стих пока нет.</p>}
               {current && (
                 <div key={`${verse?.ref}-${picked}`}>
-                  <div className="commentary-text text-[17px] leading-relaxed text-ink" dangerouslySetInnerHTML={{ __html: current.html }} />
+                  <div className="commentary-text text-[1.0625rem] leading-relaxed text-ink" dangerouslySetInnerHTML={{ __html: current.html }} />
                   <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-[0.18em]">
                     {current.source?.url && (
                       <a href={current.source.url} target="_blank" rel="noreferrer" className="text-[#9b2316] transition-colors hover:text-maroon-dark">

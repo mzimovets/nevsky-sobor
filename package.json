@@ -30,6 +30,7 @@
     "dayjs": "^1.11.23",
     "heic2any": "^0.0.4",
     "html-react-parser": "^6.1.8",
+    "modern-screenshot": "^4.7.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4",

@@ -1,20 +1,27 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Button } from "@heroui/react";
+import { useLiveSchedule } from "../lib/useLiveSchedule.js";
+import { dayISODate, todayIndex } from "../lib/scheduleDate.js";
 
 const NAV = [
   { to: "/about", label: "О соборе" },
-  { to: "/schedule", label: "Расписание" },
+  { to: "/clergy", label: "Духовенство" },
+  { to: "/schedule", label: "Расписание", today: true, match: ["/day", "/schedule"] },
   { to: "/announcements", label: "Объявления" },
   { to: "/news", label: "Новости" },
 ];
 
+// Логотип — белый силуэт на прозрачном фоне; красим в цвет шапки через маску
 const CathedralIcon = () => (
-  <svg width="38" height="44" viewBox="0 0 38 44" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">
-    <path d="M19 1v5M17 3h4" strokeLinecap="round" />
-    <path d="M10 16c0-6 4-9 9-9s9 3 9 9" />
-    <path d="M7 16h24M9 16v22M29 16v22M5 38h28M5 42h28M14 38V26a5 5 0 0 1 10 0v12M3 26c0-4 2-6 4-6M35 26c0-4-2-6-4-6" strokeLinecap="round" />
-  </svg>
+  <span
+    aria-hidden
+    className="block h-16 w-[4.8125rem] bg-[#9b2316] sm:h-20 sm:w-[6rem]"
+    style={{
+      WebkitMask: "url(/logo.webp) center / contain no-repeat",
+      mask: "url(/logo.webp) center / contain no-repeat",
+    }}
+  />
 );
 
 const BurgerIcon = ({ open }) => (
@@ -45,6 +52,13 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const solid = !home || pastHero;
+  const { days } = useLiveSchedule();
+
+  // «Расписание» ведёт сразу на сегодняшний день (или ближайший, если
+  // сегодня в расписании нет); пока расписание не загружено — на общую страницу.
+  const todayISO = days.length ? dayISODate(days[todayIndex(days)]) : null;
+  const hrefOf = (item) => (item.today && todayISO ? `/day/${todayISO}` : item.to);
+  const activeOf = (item, isActive) => (item.match ? item.match.some((m) => pathname.startsWith(m)) : isActive);
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
@@ -81,13 +95,13 @@ export default function Header() {
           <span className={`font-serif-hero leading-tight transition-colors duration-300 ${solid ? "text-ink" : "text-[#8a1f14]"}`}>
             <span className="block text-lg sm:text-xl">Собор</span>
             <span className="block text-lg sm:text-xl">Александра Невского</span>
-            <span className={`mt-0.5 block text-[10px] uppercase tracking-[0.25em] transition-colors duration-500 ${"text-[#9b2316]"}`}>Волгоград</span>
+            <span className={`mt-0.5 block text-[0.625rem] uppercase tracking-[0.25em] transition-colors duration-500 ${"text-[#9b2316]"}`}>Волгоград</span>
           </span>
         </NavLink>
 
         <nav className="hidden items-center gap-9 md:flex">
           {NAV.map((item) => (
-            <NavLink key={item.to} to={item.to} className={nav}>
+            <NavLink key={item.to} to={hrefOf(item)} className={({ isActive }) => nav({ isActive: activeOf(item, isActive) })}>
               {item.label}
             </NavLink>
           ))}
@@ -107,7 +121,7 @@ export default function Header() {
       {menuOpen && (
         <nav className={`relative mx-4 mb-3 flex flex-col gap-1 rounded-2xl p-3 backdrop-blur md:hidden ${solid ? "border border-[#ece6e1] bg-white" : "bg-maroon/95"}`}>
           {NAV.map((item) => (
-            <NavLink key={item.to} to={item.to} className={(st) => `rounded-xl px-3 py-2.5 ${nav(st)}`}>
+            <NavLink key={item.to} to={hrefOf(item)} className={({ isActive }) => `rounded-xl px-3 py-2.5 ${nav({ isActive: activeOf(item, isActive) })}`}>
               {item.label}
             </NavLink>
           ))}

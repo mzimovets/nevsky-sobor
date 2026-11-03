@@ -41,12 +41,12 @@ const INFO = [
 // Декоративный крест на разделителях панели — контурный, с белой серединой
 // (public/ornaments/cross-outline.webp).
 const CrossMark = () => (
-  <img src="/ornaments/cross-outline.webp" alt="" aria-hidden width="22" height="22" className="block h-[22px] w-[22px] select-none" draggable={false} />
+  <img src="/ornaments/cross-outline.webp" alt="" aria-hidden width="22" height="22" className="block h-[1.375rem] w-[1.375rem] select-none" draggable={false} />
 );
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative flex min-h-[640px] flex-col overflow-hidden bg-[#e9f1fa] text-ink md:h-[min(100svh,860px)]">
+    <section id="hero" className="relative flex min-h-[40rem] flex-col overflow-hidden bg-[#e9f1fa] text-ink md:h-[min(100svh,max(53.75rem,56.25vw))]">
       <img
         src="/hero.webp"
         alt=""

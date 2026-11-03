@@ -25,7 +25,7 @@ export default function NewsSection() {
 
   return (
     <section className="w-full px-6 py-12 sm:px-10">
-      <div className="mx-auto max-w-[1700px]">
+      <div className="mx-auto max-w-[106.25rem]">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
             <Eyebrow className="text-xs uppercase text-[#9b2316]">Жизнь собора</Eyebrow>

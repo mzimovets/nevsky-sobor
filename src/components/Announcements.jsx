@@ -180,7 +180,7 @@ export default function Announcements() {
                     <span className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/30 to-transparent" />
                     <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1c1208]/85 via-[#1c1208]/45 to-transparent p-4 pt-14">
                       <span aria-hidden className="mb-2 block h-px w-8 bg-gradient-to-r from-[#f0a89f] to-transparent" />
-                      <span className="font-serif-hero block text-[22px] leading-tight text-white">{item.title}</span>
+                      <span className="font-serif-hero block text-[1.375rem] leading-tight text-white">{item.title}</span>
                     </span>
                   </span>
                 </button>

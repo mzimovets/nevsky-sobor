@@ -8,7 +8,7 @@ export default function AkathistBanner() {
   return (
     <section className="w-full px-6 pb-6 pt-0 sm:px-10">
       {/* карточка не обрезает содержимое: флаг статуи выходит за её верхнюю кромку */}
-      <div className="relative mx-auto max-w-[1700px] rounded-[28px] border border-[#e3d6cf] bg-gradient-to-r from-[#f6e8e5] via-[#fbf4f2] to-[#ffffff] px-7 py-10 sm:mt-[7rem] sm:min-h-[19rem] sm:px-14 sm:py-12">
+      <div className="relative mx-auto max-w-[106.25rem] rounded-[28px] border border-[#e3d6cf] bg-gradient-to-r from-[#f6e8e5] via-[#fbf4f2] to-[#ffffff] px-7 py-10 sm:mt-[7rem] sm:min-h-[19rem] sm:px-14 sm:py-12">
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]">
           <img src="/ornaments/corner.webp" alt="" className="absolute -bottom-6 -right-6 w-36 select-none opacity-90 sm:w-52" />
         </div>

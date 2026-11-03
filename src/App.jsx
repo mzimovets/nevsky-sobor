@@ -5,6 +5,7 @@ import Footer from "./components/Footer.jsx";
 import ScrollToTopButton from "./components/ScrollToTopButton.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import Home from "./pages/Home.jsx";
+import { COMMUNION, BAPTISM } from "./lib/sacraments.js";
 const Schedule = lazy(() => import("./pages/Schedule.jsx"));
 const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage.jsx"));
 const NewsPage = lazy(() => import("./pages/NewsPage.jsx"));
@@ -12,6 +13,8 @@ const DayPage = lazy(() => import("./pages/DayPage.jsx"));
 const NewsArticlePage = lazy(() => import("./pages/NewsArticlePage.jsx"));
 const RequisitesPage = lazy(() => import("./pages/RequisitesPage.jsx"));
 const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
+const ClergyPage = lazy(() => import("./pages/ClergyPage.jsx"));
+const SacramentPage = lazy(() => import("./pages/SacramentPage.jsx"));
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
           <Route path="/news/:id" element={<NewsArticlePage />} />
           <Route path="/requisites" element={<RequisitesPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/clergy" element={<ClergyPage />} />
+          <Route path="/tainstvo-prichashenie" element={<SacramentPage key="c" data={COMMUNION} />} />
+          <Route path="/tainstvo-kreshenie" element={<SacramentPage key="b" data={BAPTISM} />} />
         </Routes>
         </Suspense>
       </main>

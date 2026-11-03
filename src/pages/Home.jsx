@@ -3,6 +3,7 @@ import Hero from "../components/Hero.jsx";
 import Announcements from "../components/Announcements.jsx";
 import DaySchedule from "../components/DaySchedule.jsx";
 import AkathistBanner from "../components/AkathistBanner.jsx";
+import SacramentsSection from "../components/SacramentsSection.jsx";
 import NewsSection from "../components/NewsSection.jsx";
 
 export default function Home() {
@@ -27,6 +28,8 @@ export default function Home() {
       <DaySchedule days={days} fontSize={fontSize} />
 
       <AkathistBanner />
+
+      <SacramentsSection />
 
       <NewsSection />
     </>

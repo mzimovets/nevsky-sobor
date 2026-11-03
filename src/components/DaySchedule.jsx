@@ -18,7 +18,7 @@ const Arrow = ({ dir = "right" }) => (
   </svg>
 );
 
-const DocIcon = () => (
+export const DocIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
     <path d="M14 2v6h6M16 13H8M16 17H8" />
@@ -151,7 +151,7 @@ export default function DaySchedule({ days, fontSize }) {
 
   return (
     <section id="schedule" className="w-full overflow-x-clip px-6 py-12 [--pad:1.5rem] sm:px-10 sm:[--pad:2.5rem]">
-      <div className="mx-auto max-w-[1700px]">
+      <div className="mx-auto max-w-[106.25rem]">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
             <Eyebrow className="text-xs uppercase text-[#9b2316]">Богослужения</Eyebrow>
@@ -191,11 +191,11 @@ export default function DaySchedule({ days, fontSize }) {
               <span className="font-serif-hero text-lg uppercase leading-none tracking-[0.06em] text-ink">
                 {MONTHS_NOM[Number(today.month) - 1]}
               </span>
-              <span className="text-[10px] uppercase tracking-[0.24em] text-muted">{today.dayWeek}</span>
+              <span className="text-[0.625rem] uppercase tracking-[0.24em] text-muted">{today.dayWeek}</span>
             </span>
           </span>
           <span className="min-w-0">
-            <span className="mb-1 hidden text-[10px] uppercase tracking-[0.24em] text-[#9b2316] sm:block">
+            <span className="mb-1 hidden text-[0.625rem] uppercase tracking-[0.24em] text-[#9b2316] sm:block">
               {todayStatus === "today" ? "Сегодня" : "Ближайший день"}
             </span>
             <span className="block text-lg leading-snug text-ink sm:text-lg sm:leading-relaxed">{todayFeast || "Богослужения по расписанию"}</span>
@@ -206,11 +206,11 @@ export default function DaySchedule({ days, fontSize }) {
           {/* Нижняя строка карточки — только на телефоне: метка дня слева,
               «Подробнее о дне» со стрелкой справа. */}
           <span className="col-span-2 flex items-center justify-between gap-4 border-t border-[#ece6e1] pt-4 sm:hidden">
-            <span className="rounded-full border border-[#e3d6cf] bg-[#fbeeea] px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-[#9b2316]">
+            <span className="rounded-full border border-[#e3d6cf] bg-[#fbeeea] px-4 py-2.5 text-[0.625rem] uppercase tracking-[0.16em] text-[#9b2316]">
               {todayStatus === "today" ? "Сегодня" : "Ближайший день"}
             </span>
             <span className="flex items-center gap-3">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-ink">Подробнее о дне</span>
+              <span className="text-[0.625rem] uppercase tracking-[0.2em] text-ink">Подробнее о дне</span>
               <span className="grid h-11 w-11 place-items-center rounded-full border border-[#9b2316]/30 text-ink">
                 <Arrow />
               </span>
@@ -243,7 +243,7 @@ export default function DaySchedule({ days, fontSize }) {
               // hover «мигает», и анимация выглядит дёрганой.
               <div
                 key={`${day.month}-${day.dateWeek}-${i}`}
-                className="dwrap w-[82vw] shrink-0 snap-start select-none sm:w-[300px] lg:w-[330px]"
+                className="dwrap w-[82vw] shrink-0 snap-start select-none sm:w-[18.75rem] lg:w-[20.625rem]"
                 onPointerMove={onCardMove}
               >
               <div
@@ -279,7 +279,7 @@ export default function DaySchedule({ days, fontSize }) {
                     <span className="font-serif-hero text-base uppercase leading-none tracking-[0.06em]">
                       {MONTHS_NOM[Number(day.month) - 1]}
                     </span>
-                    <span className={`text-[9.5px] uppercase tracking-[0.22em] ${isToday ? "text-[#efe7d8]/60" : "text-muted"}`}>
+                    <span className={`text-[0.59375rem] uppercase tracking-[0.22em] ${isToday ? "text-[#efe7d8]/60" : "text-muted"}`}>
                       {day.dayWeek}
                     </span>
                   </span>
@@ -287,7 +287,7 @@ export default function DaySchedule({ days, fontSize }) {
 
                 {day.saintsOfDay && (
                   <div
-                    className={`rich-text mt-4 text-[13.5px] leading-relaxed ${isToday ? "[&_*]:!text-[#efe7d8]/85" : ""}`}
+                    className={`rich-text mt-4 text-[0.84375rem] leading-relaxed ${isToday ? "[&_*]:!text-[#efe7d8]/85" : ""}`}
                     dangerouslySetInnerHTML={{ __html: day.saintsOfDay }}
                   />
                 )}
@@ -295,13 +295,13 @@ export default function DaySchedule({ days, fontSize }) {
                 <div className={`mt-4 flex flex-col gap-2.5 border-t pt-4 ${isToday ? "border-[#e8a79e]/25" : "border-[#ece6e1]"}`}>
                   {services.length ? (
                     services.map((svc, j) => (
-                      <div key={j} className="grid grid-cols-[48px_minmax(0,1fr)] gap-2.5 text-[13.5px] leading-snug">
+                      <div key={j} className="grid grid-cols-[48px_minmax(0,1fr)] gap-2.5 text-[0.84375rem] leading-snug">
                         <span className={`font-semibold tabular-nums ${isToday ? "text-[#e8a79e]" : "text-[#9b2316]"}`}>{svc.time}</span>
                         <span className={isToday ? "text-[#efe7d8]/85" : "text-ink/80"}>{svc.text}</span>
                       </div>
                     ))
                   ) : (
-                    <span className={`text-[13.5px] italic ${isToday ? "text-[#efe7d8]/60" : "text-muted"}`}>
+                    <span className={`text-[0.84375rem] italic ${isToday ? "text-[#efe7d8]/60" : "text-muted"}`}>
                       Богослужения по расписанию
                     </span>
                   )}
@@ -323,7 +323,7 @@ export default function DaySchedule({ days, fontSize }) {
           <PosterOverlay
             days={days}
             fontSize={fontSize}
-            className="inline-flex cursor-pointer items-center gap-3 rounded-full border border-ink/20 px-7 py-4 text-[10px] font-medium uppercase tracking-[0.2em] text-ink transition-colors hover:border-[#b8453a] hover:bg-[#b8453a]/10 hover:text-[#9b2316]"
+            className="inline-flex cursor-pointer items-center gap-3 rounded-full border border-ink/20 px-7 py-4 text-[0.625rem] font-medium uppercase tracking-[0.2em] text-ink transition-colors hover:border-[#b8453a] hover:bg-[#b8453a]/10 hover:text-[#9b2316]"
           >
             <span className="text-[#b8453a]">
               <DocIcon />

@@ -136,7 +136,7 @@ const YANDEX_MAP = "https://yandex.ru/map-widget/v1/?ol=biz&oid=116732981896&z=1
 function MapCard({ title, src }) {
   return (
     <div className="rounded-[1.75rem] border border-[#ece6e1] bg-[#ffffff] p-1.5 shadow-sm">
-      <div className="relative h-[480px] overflow-hidden rounded-[1.4rem] sm:h-[520px] lg:h-[560px]">
+      <div className="relative h-[30rem] overflow-hidden rounded-[1.4rem] sm:h-[32.5rem] lg:h-[35rem]">
         <iframe
           title={title}
           src={src}
@@ -174,7 +174,7 @@ export default function Footer() {
           "bottom-7 left-7 sm:bottom-9 sm:left-9",
           "bottom-7 right-7 sm:bottom-9 sm:right-9",
         ].map((pos) => (
-          <img key={pos} src="/ornaments/cross.webp" alt="" aria-hidden width="18" height="18" draggable={false} className={`pointer-events-none absolute h-3.5 w-3.5 select-none sm:h-[18px] sm:w-[18px] ${pos}`} />
+          <img key={pos} src="/ornaments/cross.webp" alt="" aria-hidden width="18" height="18" draggable={false} className={`pointer-events-none absolute h-3.5 w-3.5 select-none sm:h-[1.125rem] sm:w-[1.125rem] ${pos}`} />
         ))}
         <div>
           
@@ -214,7 +214,7 @@ export default function Footer() {
                   />
                 </svg>
               </span>
-              <span className="text-[11px] uppercase tracking-[0.25em] text-ink/70 transition-colors group-hover:text-[#9b2316]">
+              <span className="text-[0.6875rem] uppercase tracking-[0.25em] text-ink/70 transition-colors group-hover:text-[#9b2316]">
                 {s.label}
               </span>
             </a>
@@ -241,7 +241,7 @@ export default function Footer() {
                     {c.icon}
                   </span>
                   <span>
-                    <span className="block text-[11px] uppercase tracking-[0.25em] text-ink/55">{c.label}</span>
+                    <span className="block text-[0.6875rem] uppercase tracking-[0.25em] text-ink/55">{c.label}</span>
                     <span className={`mt-1.5 block text-lg text-ink transition-colors ${c.href ? "group-hover:text-[#9b2316]" : ""}`}>{c.value}</span>
                   </span>
                 </>
@@ -287,7 +287,7 @@ export default function Footer() {
                 <h3 style={{ textTransform: "none" }} className="font-serif-hero text-2xl text-[#7a1a10]">
                   <RevealWords text={g.title} />
                 </h3>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-ink/55">{g.note}</p>
+                <p className="mt-1 text-[0.6875rem] uppercase tracking-[0.2em] text-ink/55">{g.note}</p>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {g.links.map((l) => (
@@ -316,9 +316,9 @@ export default function Footer() {
                       </span>
                     </span>
                     <span className="lc-text relative">
-                      <span className="lc-title text-[12px] font-semibold uppercase leading-snug tracking-[0.08em] text-[#7a1a10]">{l.label}</span>
+                      <span className="lc-title text-[0.75rem] font-semibold uppercase leading-snug tracking-[0.08em] text-[#7a1a10]">{l.label}</span>
                       <span className="mx-auto mt-2 block h-px w-10 bg-gradient-to-r from-transparent via-[#d4574a] to-transparent" aria-hidden />
-                      <span className="mt-2 block text-[12.5px] leading-snug text-ink/75">{l.text}</span>
+                      <span className="mt-2 block text-[0.78125rem] leading-snug text-ink/75">{l.text}</span>
                     </span>
                   </a>
                 ))}

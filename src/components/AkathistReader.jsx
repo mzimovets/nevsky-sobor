@@ -164,7 +164,7 @@ function PageFace({ page, size }) {
     <div className={`relative overflow-hidden ${PAGE_BG}`} style={{ width: W, height: H }}>
       {/* колонтитул — часть страницы, листается вместе с текстом */}
       <div className="absolute inset-x-0 top-0 px-[3.75rem] pt-3 text-center sm:px-20" aria-hidden>
-        <p className="text-[9px] uppercase leading-snug tracking-[0.1em] text-[#9b2316] sm:text-[11px] sm:tracking-[0.26em]">Акафист святому Александру Невскому</p>
+        <p className="text-[0.5625rem] uppercase leading-snug tracking-[0.1em] text-[#9b2316] sm:text-[0.6875rem] sm:tracking-[0.26em]">Акафист святому Александру Невскому</p>
         <div className="mx-auto mt-2.5 flex max-w-xs items-center justify-center gap-3 text-[#d4574a]">
           <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#d4574a]/80" />
           <span className="text-[0.45rem]">◆</span>
@@ -246,9 +246,12 @@ function Book({ onProgress, onToc }) {
 
   const size = useMemo(() => {
     if (!stage.w || !stage.h) return null;
-    const textW = Math.min(600, stage.w - 40);
-    const fs = Math.max(16, Math.min(21, textW * 0.04));
-    return { W: stage.w, H: stage.h, fs, padX: (stage.w - textW) / 2, padTop: 76, padBottom: 92 };
+    // на больших экранах (корневой шрифт > 16px, см. theme.css) страница книги растёт целиком:
+    // колонка текста, кегль и поля — в k раз
+    const k = Math.max(1, parseFloat(getComputedStyle(document.documentElement).fontSize) / 16 || 1);
+    const textW = Math.min(600 * k, stage.w - 40);
+    const fs = Math.max(16 * k, Math.min(21 * k, textW * 0.04));
+    return { W: stage.w, H: stage.h, fs, padX: (stage.w - textW) / 2, padTop: 76 * k, padBottom: 92 * k };
   }, [stage]);
 
   const sizeKey = size ? `${size.W}-${size.H}` : "";
@@ -503,7 +506,7 @@ function TocList({ toc, current, activeSet, onGo }) {
               aria-current={active ? "true" : undefined}
               onClick={() => onGo(t.page)}
               className={`ml-5 flex w-[calc(100%-1.25rem)] items-center justify-between gap-3 rounded-xl px-3 text-left transition-all ${
-                ikos ? "my-0.5 py-2.5 text-[19px]" : "py-1.5 text-[15px]"
+                ikos ? "my-0.5 py-2.5 text-[1.1875rem]" : "py-1.5 text-[0.9375rem]"
               } ${
                 active
                   ? "toc-glint bg-gradient-to-b from-[#b3382a] to-[#7a1a10] text-white shadow-[0_6px_16px_-6px_rgba(122,26,16,0.8)]"
@@ -559,14 +562,14 @@ function FirstHint() {
     <li className="flex items-start gap-4">
       <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[#d4574a]/60 bg-white/60 text-[#9b2316]">{icon}</span>
       <span>
-        <span className="block text-[21px] leading-tight text-[#2f2523]">{title}</span>
-        <span className="mt-1 block text-[17px] leading-snug text-[#2f2523]/65">{children}</span>
+        <span className="block text-[1.3125rem] leading-tight text-[#2f2523]">{title}</span>
+        <span className="mt-1 block text-[1.0625rem] leading-snug text-[#2f2523]/65">{children}</span>
       </span>
     </li>
   );
   return (
     <div className="hint-backdrop absolute inset-0 z-30 flex overflow-y-auto bg-[#2a1d12]/55 p-4 backdrop-blur-sm" role="group" aria-label="Как читать акафист">
-      <div className={`hint-card ${PAGE_BG} ${TEXT_FONT} relative m-auto w-full max-w-[420px] rounded-[28px] px-6 pb-6 pt-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]`}>
+      <div className={`hint-card ${PAGE_BG} ${TEXT_FONT} relative m-auto w-full max-w-[26.25rem] rounded-[28px] px-6 pb-6 pt-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]`}>
         <img src="/ornaments/corner.webp" alt="" aria-hidden draggable={false} className="pointer-events-none absolute -left-4 -top-4 w-24 -scale-x-100 select-none opacity-50" />
         <h3 style={{ textTransform: "none", fontSize: "2rem", lineHeight: 1.1, fontWeight: 500 }} className={`${TEXT_FONT} text-center ${GOLD_TEXT}`}>
           Как читать
@@ -619,7 +622,7 @@ function FirstHint() {
         <button
           type="button"
           onClick={close}
-          className="mt-6 w-full rounded-full bg-[#9b2316] py-3.5 text-[16px] uppercase tracking-[0.2em] text-white shadow-lg transition-colors hover:bg-[#7a1a10]"
+          className="mt-6 w-full rounded-full bg-[#9b2316] py-3.5 text-[1rem] uppercase tracking-[0.2em] text-white shadow-lg transition-colors hover:bg-[#7a1a10]"
         >
           Понятно
         </button>
@@ -721,13 +724,13 @@ export default function AkathistReader({ children, className = "" }) {
               <Drawer isOpen={tocOpen} onOpenChange={setTocOpen}>
                 <Drawer.Backdrop variant="blur">
                   <Drawer.Content placement="left">
-                    <Drawer.Dialog className={`toc-dialog ${PAGE_BG} ${TEXT_FONT} !w-[min(86vw,360px)] !p-0`}>
+                    <Drawer.Dialog className={`toc-dialog ${PAGE_BG} ${TEXT_FONT} !w-[min(86vw,22.5rem)] !p-0`}>
                       <Drawer.CloseTrigger className="!absolute right-4 top-4 z-20 grid !h-10 !w-10 place-items-center !rounded-full !bg-white !text-[#9b2316] shadow-lg transition-colors hover:!bg-[#9b2316] hover:!text-white">
                         <CloseIcon />
                       </Drawer.CloseTrigger>
                       <div className="relative shrink-0 overflow-hidden px-7 pb-4 pt-8 text-center">
                         <img src="/ornaments/corner.webp" alt="" aria-hidden draggable={false} className="pointer-events-none absolute -left-5 -top-5 w-24 -scale-x-100 opacity-50 select-none" />
-                        <p className="text-[11px] uppercase tracking-[0.3em] text-[#9b2316]">Акафист</p>
+                        <p className="text-[0.6875rem] uppercase tracking-[0.3em] text-[#9b2316]">Акафист</p>
                         <Drawer.Heading style={{ fontFamily: "inherit", fontWeight: 500, textTransform: "none", fontSize: "2rem", lineHeight: 1.1, letterSpacing: 0 }} className={`mt-1 ${GOLD_TEXT}`}>
                           Оглавление
                         </Drawer.Heading>

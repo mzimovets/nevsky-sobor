@@ -291,7 +291,7 @@ export default function RichTextEditor({ content, onChange, uploadImage }) {
     },
     onSelectionUpdate: ({ editor: ed }) => updateSlashState(ed),
     editorProps: {
-      attributes: { class: "article-content tiptap min-h-[240px] focus:outline-none" },
+      attributes: { class: "article-content tiptap min-h-[15rem] focus:outline-none" },
       handleKeyDown: handleEditorKeyDown,
     },
   });
