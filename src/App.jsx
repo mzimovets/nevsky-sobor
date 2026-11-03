@@ -5,7 +5,7 @@ import Footer from "./components/Footer.jsx";
 import ScrollToTopButton from "./components/ScrollToTopButton.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import Home from "./pages/Home.jsx";
-import { COMMUNION, BAPTISM } from "./lib/sacraments.js";
+import { COMMUNION, BAPTISM, CONFESSION } from "./lib/sacraments.js";
 const Schedule = lazy(() => import("./pages/Schedule.jsx"));
 const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage.jsx"));
 const NewsPage = lazy(() => import("./pages/NewsPage.jsx"));
@@ -36,6 +36,7 @@ function App() {
           <Route path="/clergy" element={<ClergyPage />} />
           <Route path="/tainstvo-prichashenie" element={<SacramentPage key="c" data={COMMUNION} />} />
           <Route path="/tainstvo-kreshenie" element={<SacramentPage key="b" data={BAPTISM} />} />
+          <Route path="/tainstvo-ispoved" element={<SacramentPage key="i" data={CONFESSION} />} />
         </Routes>
         </Suspense>
       </main>

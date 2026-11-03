@@ -198,6 +198,24 @@ export default function SacramentPage({ data }) {
                 +7 (996) 510 90 90
               </a>
             </section>
+
+            {(data.note || data.sources) && (
+              <section className="px-2 text-sm leading-relaxed text-ink/60">
+                {data.note && <p>{data.note}</p>}
+                {data.sources && (
+                  <>
+                    <p className="mt-3 text-[0.6875rem] uppercase tracking-[0.24em] text-[#9b2316]/80">Источники</p>
+                    <ul className="mt-2 flex flex-col gap-1">
+                      {data.sources.map((x) => (
+                        <li key={x.href}>
+                          <a href={x.href} target="_blank" rel="noreferrer" className="underline decoration-[#d4574a]/40 underline-offset-2 transition-colors hover:text-[#9b2316]">{x.title}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </section>
+            )}
           </div>
         </div>
       </div>
